@@ -1,3 +1,4 @@
+import math
 import cv2
 import numpy as np
 import pywavefront
@@ -6,6 +7,8 @@ model_vertices_file = 'sources/tv_picture_centered.obj'
 camera_params_file = 'sources/camera_params.txt'
 first_frame_pixels_file = 'sources/first_frame_2d_pixels.txt'
 video_source = 'sources/tv_on.mp4'
+
+np.set_printoptions(precision=3, suppress=True)
 
 
 def read_camera_params():
@@ -36,9 +39,30 @@ first_frame_pixels = read_first_frame_pixels()
 # Find rotation and translation
 _, rotation, translation = cv2.solvePnP(model_vertices, first_frame_pixels, camera_params, np.array([]))
 
+# Find external parameters matrix
+R_x = np.array([[1, 0, 0],
+                [0, math.cos(rotation[0]), -math.sin(rotation[0])],
+                [0, math.sin(rotation[0]), math.cos(rotation[0])]
+                ])
+R_y = np.array([[math.cos(rotation[1]), 0, math.sin(rotation[1])],
+                [0, 1, 0],
+                [-math.sin(rotation[1]), 0, math.cos(rotation[1])]
+                ])
+R_z = np.array([[math.cos(rotation[2]), -math.sin(rotation[2]), 0],
+                [math.sin(rotation[2]), math.cos(rotation[2]), 0],
+                [0, 0, 1]
+                ])
+R = np.dot(R_z, np.dot(R_y, R_x))
+external_matrix = np.hstack((R, translation))
+print("External matrix:\n", external_matrix)
+
 # Find points on screen
-points = cv2.projectPoints(model_vertices, rotation, translation, camera_params, np.array([]))
-points = np.array([point[0] for point in points[0]])
+projection_matrix = np.dot(camera_params, external_matrix)
+model_vertices_matrix = np.hstack((model_vertices, np.ones((len(model_vertices), 1)))).T
+points_homogeneous = np.dot(projection_matrix, model_vertices_matrix).T
+points = points_homogeneous[:, :2]
+points_w = points_homogeneous[:, 2:]
+points = points / points_w
 
 # Reading first video frame
 cap = cv2.VideoCapture(video_source)
