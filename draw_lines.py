@@ -65,8 +65,6 @@ ground_truth_external_matrix[:3, :3] = ground_truth_external_matrix[:3, :3].T
 # Find external parameters matrix
 R_rodrigues = cv2.Rodrigues(rotation)[0]
 external_matrix = np.hstack((R_rodrigues, translation))
-print("External matrix:\n", external_matrix)
-print("External matrix ground truth:\n", ground_truth_external_matrix)
 
 
 def screen_points(camera_params, external_matrix, model_vertices):
@@ -82,7 +80,7 @@ def screen_points(camera_params, external_matrix, model_vertices):
 def rotation_translation_points(matrix):
     rotation = matrix[:3, :3]
     translation = matrix[:, 3:4]
-    points = screen_points(camera_params, external_matrix, model_vertices)
+    points = screen_points(camera_params, matrix, model_vertices)
     return rotation, translation, points
 
 
@@ -94,27 +92,27 @@ def rotation_difference(actual, expected):
     return diff_angle
 
 
-def translation_difference(actual, expected):
+def translation_difference(actual, expected, norm_coefficient):
     diff = distance.euclidean(actual, expected)
-    log_error_if_differ_much(diff, 5.0, 'External parameters translation')
+    diff /= norm_coefficient
+    log_error_if_differ_much(diff, 0.1, 'External parameters translation')
     return diff
 
 
-def points_difference(actual, expected):
-    diff = 0
-    for act, exp in zip(actual, expected):
-        diff += distance.euclidean(act, exp)
-    diff /= len(actual)
+def points_difference(actual, expected, norm_coefficient):
+    diff = np.linalg.norm(actual - expected, axis=1).mean()
+    diff /= norm_coefficient
     log_error_if_differ_much(diff, 0.1, 'Projected points')
     return diff
 
 
 def difference(actual, expected):
+    norm_coefficient = np.linalg.norm(model_vertices[0] - model_vertices[2])  # screen diagonal
     actual_rotation, actual_translation, actual_points = rotation_translation_points(actual)
     expected_rotation, expected_translation, expected_points = rotation_translation_points(expected)
     rotation_difference(actual_rotation, expected_rotation)
-    translation_difference(actual_translation, expected_translation)
-    points_difference(actual_points, expected_points)
+    translation_difference(actual_translation, expected_translation, norm_coefficient)
+    points_difference(actual_points, expected_points, norm_coefficient)
 
 
 difference(external_matrix, ground_truth_external_matrix)
