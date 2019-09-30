@@ -50,20 +50,27 @@ def difference(actual, expected, projection, model_vertices):
         rotation_translation_points(actual, projection, model_vertices)
     expected_rotation, expected_translation, expected_points = \
         rotation_translation_points(expected, projection, model_vertices)
-    rotation_difference(actual_rotation, expected_rotation)
-    translation_difference(actual_translation, expected_translation, norm_coefficient)
-    points_difference(actual_points, expected_points, norm_coefficient)
+
+    rotation_diff = rotation_difference(actual_rotation, expected_rotation)
+    translation_diff = translation_difference(actual_translation, expected_translation, norm_coefficient)
+    points_diff = points_difference(actual_points, expected_points, norm_coefficient)
+
+    return np.array([rotation_diff, translation_diff, points_diff])
 
 
 reader = TrackingDataReader()
 untracked_frames = []
+average_diff = np.array([0.0, 0.0, 0.0])
 for key, value in reader.get_ground_truth().items():
     if key in reader.get_tracking_result():
         print('Frame:', key)
         tr = reader.get_tracking_result()[key]
         gt = value
-        difference(tr, gt, reader.get_projection_matrix(), reader.get_model_vertices())
+        average_diff += difference(tr, gt, reader.get_projection_matrix(), reader.get_model_vertices())
     else:
         untracked_frames.append(key)
+
+frames_number = len(reader.get_ground_truth().items()) - len(untracked_frames)
+print('Average difference: ', average_diff / frames_number)
 
 logging.error('Untracked frames: ' + str(untracked_frames))

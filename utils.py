@@ -98,6 +98,3 @@ class TrackingDataReader:
         for frame, points in resulting_points.items():
             points += np.random.rand(len(points), 2) * 3
         return resulting_points
-
-
-reader = TrackingDataReader()
