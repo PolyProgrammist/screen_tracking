@@ -11,18 +11,21 @@ class TrackingDataReader:
     def __init__(self, test='sources/'):
         self.__test = test
 
+    def get_file_root_relative(self, file):
+        return self.__test + file
+
     @lru_cache(None)
     def get_test_description(self):
-        with open(self.__test + 'test_description.yml') as fin:
+        with open(self.get_file_root_relative('test_description.yml')) as fin:
             return yaml.load(fin)
 
     @lru_cache(None)
     def get_model_vertices(self):
-        return np.array(pywavefront.Wavefront(self.__test + self.get_test_description()['mesh']).vertices)
+        return np.array(pywavefront.Wavefront(self.get_file_root_relative(self.get_test_description()['mesh'])).vertices)
 
     @lru_cache(None)
     def get_tracking_matrix(self, file):
-        with open(self.__test + file) as fin:
+        with open(self.get_file_root_relative(file)) as fin:
             input = yaml.load(fin)
             result = {}
             for frame in input:
@@ -31,17 +34,54 @@ class TrackingDataReader:
                 result[frame['frame']] = np.hstack((R, t))
             return result
 
+    def write_result(self, result):
+        with open(self.get_file_root_relative(self.get_tracking_result_file()), 'w') as fout:
+            to_write = []
+            for frame, matrix in result.items():
+                frame_result = {
+                    'frame': frame,
+                    'pose': {
+                        'R': matrix[:3, :3].tolist(),
+                        't': matrix[:3, 3].T.reshape(3).tolist()
+                    }
+                }
+                to_write.append(frame_result)
+
+            yaml.dump(to_write, fout, default_flow_style=None)
+
+    def get_video_source(self):
+        return self.get_test_description()['source_to_track']
+
     def get_ground_truth(self):
         return self.get_tracking_matrix(self.get_test_description()['ground_truth'])
 
+    def get_tracking_result_file(self):
+        return 'tracking_result.yml'
+
     def get_tracking_result(self):
-        return self.get_tracking_matrix('tracking_result.yml')
+        return self.get_tracking_matrix(self.get_tracking_result_file())
 
     def get_projection_matrix(self):
         return np.array(self.get_test_description()['projection'])
 
+    def compare_input(self):
+        self.get_model_vertices(),
+        self.get_projection_matrix(),
+        self.get_ground_truth(),
+        self.get_tracking_result(),
+
+    def draw_input(self):
+        self.get_model_vertices(),
+        self.get_projection_matrix(),
+        self.get_video_source(),
+        self.get_tracking_result()
+
     def tracker_input(self):
-        return self.get_model_vertices(), self.get_projection_matrix(), self.generate_user_input()
+        return self.get_model_vertices(), \
+               self.get_projection_matrix(), \
+               self.get_file_root_relative(self.get_video_source()), \
+               self.generate_user_input(), \
+               self.get_file_root_relative(self.get_tracking_result_file())
 
     def get_resulting_points(self, frames, poses):
         result = {}
