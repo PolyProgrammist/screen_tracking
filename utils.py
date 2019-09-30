@@ -80,7 +80,7 @@ class TrackingDataReader:
         return self.get_model_vertices(), \
                self.get_projection_matrix(), \
                self.get_file_root_relative(self.get_video_source()), \
-               self.generate_user_input(), \
+               self.generate_user_input_from_ground_truth(), \
                self.get_file_root_relative(self.get_tracking_result_file())
 
     def get_resulting_points(self, frames, poses):
@@ -93,8 +93,11 @@ class TrackingDataReader:
             )
         return result
 
-    def generate_user_input(self):
-        return self.get_resulting_points([1, 5, 15, 23], self.get_ground_truth())
+    def generate_user_input_from_ground_truth(self):
+        resulting_points = self.get_resulting_points([1, 5, 15, 23], self.get_ground_truth())
+        for frame, points in resulting_points.items():
+            points += np.random.rand(len(points), 2) * 3
+        return resulting_points
 
 
 reader = TrackingDataReader()

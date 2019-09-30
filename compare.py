@@ -56,8 +56,14 @@ def difference(actual, expected, projection, model_vertices):
 
 
 reader = TrackingDataReader()
+untracked_frames = []
 for key, value in reader.get_ground_truth().items():
-    print('Frame:', key)
-    tr = reader.get_tracking_result()[key]
-    gt = value
-    difference(tr, gt, reader.get_projection_matrix(), reader.get_model_vertices())
+    if key in reader.get_tracking_result():
+        print('Frame:', key)
+        tr = reader.get_tracking_result()[key]
+        gt = value
+        difference(tr, gt, reader.get_projection_matrix(), reader.get_model_vertices())
+    else:
+        untracked_frames.append(key)
+
+logging.error('Untracked frames: ' + str(untracked_frames))
