@@ -75,7 +75,7 @@ class TrackingDataReader:
         return \
             self.get_model_vertices(),\
             self.get_projection_matrix(),\
-            self.get_video_source(),\
+            self.get_file_root_relative(self.get_video_source()), \
             self.get_tracking_result()
 
     def tracker_input(self):
