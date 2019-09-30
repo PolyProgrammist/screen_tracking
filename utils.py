@@ -65,23 +65,26 @@ class TrackingDataReader:
         return np.array(self.get_test_description()['projection'])
 
     def compare_input(self):
-        self.get_model_vertices(),
-        self.get_projection_matrix(),
-        self.get_ground_truth(),
-        self.get_tracking_result(),
+        return \
+            self.get_model_vertices(),\
+            self.get_projection_matrix(),\
+            self.get_ground_truth(),\
+            self.get_tracking_result()
 
     def draw_input(self):
-        self.get_model_vertices(),
-        self.get_projection_matrix(),
-        self.get_video_source(),
-        self.get_tracking_result()
+        return \
+            self.get_model_vertices(),\
+            self.get_projection_matrix(),\
+            self.get_video_source(),\
+            self.get_tracking_result()
 
     def tracker_input(self):
-        return self.get_model_vertices(), \
-               self.get_projection_matrix(), \
-               self.get_file_root_relative(self.get_video_source()), \
-               self.generate_user_input_from_ground_truth(), \
-               self.get_file_root_relative(self.get_tracking_result_file())
+        return \
+            self.get_model_vertices(), \
+            self.get_projection_matrix(), \
+            self.get_file_root_relative(self.get_video_source()), \
+            self.generate_user_input_from_ground_truth(), \
+            self.get_file_root_relative(self.get_tracking_result_file())
 
     def get_resulting_points(self, frames, poses):
         result = {}

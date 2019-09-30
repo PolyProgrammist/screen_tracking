@@ -69,19 +69,21 @@ def difference(actual, expected, projection, model_vertices):
 
 
 reader = TrackingDataReader()
+model_vertices, projection_matrix, ground_truth, tracking_result = reader.compare_input()
+
 untracked_frames = []
 average_diff = np.array([0.0, 0.0, 0.0])
-for key, value in reader.get_ground_truth().items():
-    if key in reader.get_tracking_result():
-        tr = reader.get_tracking_result()[key]
+for key, value in ground_truth.items():
+    if key in tracking_result:
+        tr = tracking_result[key]
         gt = value
-        current_diff = difference(tr, gt, reader.get_projection_matrix(), reader.get_model_vertices())
+        current_diff = difference(tr, gt, projection_matrix, model_vertices)
         log_errors(current_diff, 'Frame ' + str(key))
         average_diff += current_diff
     else:
         untracked_frames.append(key)
 
-frames_number = len(reader.get_ground_truth().items()) - len(untracked_frames)
+frames_number = len(ground_truth.items()) - len(untracked_frames)
 average_diff /= frames_number
 log_errors(average_diff, 'Average diff')
 
