@@ -2,9 +2,16 @@ import numpy as np
 import transforms3d
 from scipy.spatial import distance
 import logging
+from enum import Enum
 
 from common import normalize_angle, screen_points
 from utils import TrackingDataReader
+
+DIFFERENCE_PARAMETERS = [
+    (0.04, 'External parameters rotation'),
+    (0.1, 'External parameters translation'),
+    (0.1, 'Projected points')
+]
 
 
 def log_error_if_differ_much(diff, threshold, name):
@@ -15,25 +22,28 @@ def log_error_if_differ_much(diff, threshold, name):
         print(external_differ_output)
 
 
+def log_errors(difference, title):
+    print(title + ':')
+    for threshold, name, diff in zip(*zip(*DIFFERENCE_PARAMETERS), difference):
+        log_error_if_differ_much(diff, threshold, name)
+
+
 def rotation_difference(actual, expected):
     diff_matrix = np.dot(actual, np.linalg.inv(expected))
     diff_direction, diff_angle = transforms3d.axangles.mat2axangle(diff_matrix)
     diff_angle = normalize_angle(diff_angle)
-    log_error_if_differ_much(diff_angle, 0.04, 'External parameters rotation')
     return diff_angle
 
 
 def translation_difference(actual, expected, norm_coefficient):
     diff = distance.euclidean(actual, expected)
     diff /= norm_coefficient
-    log_error_if_differ_much(diff, 0.1, 'External parameters translation')
     return diff
 
 
 def points_difference(actual, expected, norm_coefficient):
     diff = np.linalg.norm(actual - expected, axis=1).mean()
     diff /= norm_coefficient
-    log_error_if_differ_much(diff, 0.1, 'Projected points')
     return diff
 
 
@@ -63,14 +73,17 @@ untracked_frames = []
 average_diff = np.array([0.0, 0.0, 0.0])
 for key, value in reader.get_ground_truth().items():
     if key in reader.get_tracking_result():
-        print('Frame:', key)
         tr = reader.get_tracking_result()[key]
         gt = value
-        average_diff += difference(tr, gt, reader.get_projection_matrix(), reader.get_model_vertices())
+        current_diff = difference(tr, gt, reader.get_projection_matrix(), reader.get_model_vertices())
+        log_errors(current_diff, 'Frame ' + str(key))
+        average_diff += current_diff
     else:
         untracked_frames.append(key)
 
 frames_number = len(reader.get_ground_truth().items()) - len(untracked_frames)
-print('Average difference: ', average_diff / frames_number)
+average_diff /= frames_number
+log_errors(average_diff, 'Average diff')
+
 
 logging.error('Untracked frames: ' + str(untracked_frames))
