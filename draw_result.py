@@ -21,7 +21,7 @@ width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 print(fps, width, height)
 
-out = cv2.VideoWriter('out.mp4', cv2.VideoWriter_fourcc(*'MP4V'), fps, (width, height))
+out = cv2.VideoWriter('sources/out.mp4', cv2.VideoWriter_fourcc(*'MP4V'), fps, (width, height))
 
 while cap.isOpened():
     ret, frame = cap.read()
