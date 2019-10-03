@@ -25,7 +25,3 @@ for frame, pixels in frame_pixels.items():
 reader.write_result(tracking_result)
 
 # cap = cv2.VideoCapture(video_source)
-
-
-
-

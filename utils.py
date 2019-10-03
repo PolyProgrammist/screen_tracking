@@ -50,7 +50,7 @@ class TrackingDataReader:
             yaml.dump(to_write, fout, default_flow_style=None)
 
     def get_video_source(self):
-        return self.get_test_description()['source_to_track']
+        return self.get_test_description()['sequence']
 
     def get_ground_truth(self):
         return self.get_tracking_matrix(self.get_test_description()['ground_truth'])
