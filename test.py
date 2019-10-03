@@ -3,7 +3,10 @@
 import coloredlogs
 import click
 
-import tracking, compare, write_result, show_result
+import tracking
+import compare
+import write_result
+import show_result
 
 from utils import TrackingDataReader
 
