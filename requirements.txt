@@ -5,3 +5,4 @@ transforms3d
 scipy
 pyyaml
 coloredlogs
+click

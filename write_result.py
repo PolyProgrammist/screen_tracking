@@ -10,12 +10,10 @@ def to_screen(point):
 
 def write_result(model_vertices, projection_matrix, video_source, tracking_result, output_file):
     frame_number = 0
-    print(video_source)
     cap = cv2.VideoCapture(video_source)
     fps = cap.get(cv2.CAP_PROP_FPS)
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    print(fps, width, height)
 
     out = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*'MP4V'), fps, (width, height))
 
