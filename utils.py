@@ -9,7 +9,12 @@ np.set_printoptions(precision=3, suppress=True)
 
 
 class TrackingDataReader:
-    def __init__(self, test='resources/tests/generated_tv_on'):
+    DEFAULT_TEST = 'resources/tests/generated_tv_on'
+    TEST_DESCRIPTION = 'test_description.yml'
+    VIDEO_OUTPUT = 'out.mp4'
+    TRACKING_RESULT = 'tracking_result.yml'
+
+    def __init__(self, test=DEFAULT_TEST):
         self.__test = test
 
     def get_file_root_relative(self, file):
@@ -17,7 +22,7 @@ class TrackingDataReader:
 
     @lru_cache(None)
     def get_test_description(self):
-        with open(self.get_file_root_relative('test_description.yml')) as fin:
+        with open(self.get_file_root_relative(self.TEST_DESCRIPTION)) as fin:
             return yaml.load(fin)
 
     @lru_cache(None)
@@ -36,7 +41,7 @@ class TrackingDataReader:
             return result
 
     def write_result(self, result):
-        with open(self.get_file_root_relative(self.get_tracking_result_file()), 'w') as fout:
+        with open(self.get_file_root_relative(self.TRACKING_RESULT), 'w') as fout:
             to_write = []
             for frame, matrix in result.items():
                 frame_result = {
@@ -53,17 +58,11 @@ class TrackingDataReader:
     def get_video_source(self):
         return self.get_test_description()['sequence']
 
-    def get_video_output(self):
-        return 'out.mp4'
-
     def get_ground_truth(self):
         return self.get_tracking_matrix(self.get_test_description()['ground_truth'])
 
-    def get_tracking_result_file(self):
-        return 'tracking_result.yml'
-
     def get_tracking_result(self):
-        return self.get_tracking_matrix(self.get_tracking_result_file())
+        return self.get_tracking_matrix(self.TRACKING_RESULT)
 
     def get_projection_matrix(self):
         return np.array(self.get_test_description()['projection'])
@@ -81,10 +80,10 @@ class TrackingDataReader:
             self.get_projection_matrix(),\
             self.get_file_root_relative(self.get_video_source()), \
             self.get_tracking_result(), \
-            self.get_file_root_relative(self.get_video_output())
+            self.get_file_root_relative(self.VIDEO_OUTPUT)
 
     def show_input(self):
-        return self.get_file_root_relative(self.get_video_output())
+        return self.get_file_root_relative(self.VIDEO_OUTPUT)
 
     def tracker_input(self):
         return \
@@ -92,7 +91,7 @@ class TrackingDataReader:
             self.get_projection_matrix(), \
             self.get_file_root_relative(self.get_video_source()), \
             self.generate_user_input_from_ground_truth(), \
-            self.get_file_root_relative(self.get_tracking_result_file())
+            self.get_file_root_relative(self.TRACKING_RESULT)
 
     def get_resulting_points(self, frames, poses):
         result = {}
