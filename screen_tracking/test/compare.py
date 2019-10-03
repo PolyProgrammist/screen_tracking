@@ -1,7 +1,8 @@
 import numpy as np
 import transforms3d
 from scipy.spatial import distance
-import logging, coloredlogs
+import logging
+import coloredlogs
 
 from screen_tracking.common.common import normalize_angle, screen_points
 from screen_tracking.common.utils import TrackingDataReader
@@ -70,15 +71,13 @@ def difference(actual, expected, projection, model_vertices):
 def compare(model_vertices, projection_matrix, ground_truth, tracking_result):
     untracked_frames = []
     average_diff = np.array([0.0, 0.0, 0.0])
-    for key, value in ground_truth.items():
-        if key in tracking_result:
-            tr = tracking_result[key]
-            gt = value
-            current_diff = difference(tr, gt, projection_matrix, model_vertices)
-            log_errors(current_diff, 'Frame ' + str(key))
+    for frame, ground_truth_matrix in ground_truth.items():
+        if frame in tracking_result:
+            current_diff = difference(tracking_result[frame], ground_truth_matrix, projection_matrix, model_vertices)
+            log_errors(current_diff, 'Frame ' + str(frame))
             average_diff += current_diff
         else:
-            untracked_frames.append(key)
+            untracked_frames.append(frame)
 
     frames_number = len(ground_truth.items()) - len(untracked_frames)
     average_diff /= frames_number

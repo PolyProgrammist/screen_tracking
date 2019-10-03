@@ -4,7 +4,7 @@ import coloredlogs
 import click
 
 from screen_tracking.tracker import tracking
-from screen_tracking.test import write_result, show_result, compare
+from screen_tracking.test import draw_result, show_result, compare
 
 from screen_tracking.common.utils import TrackingDataReader
 
@@ -14,7 +14,7 @@ from screen_tracking.common.utils import TrackingDataReader
               help='Test directory for input and output')
 @click.option('--descr', 'test_description', default='test_description.yml', help='Test description file')
 @click.option('--video-output', 'video_output', default='out.mp4', help='Tracker video output file')
-@click.option('--tracking-result', 'tracking_result', default='tracking_result.yml', help='Tracker result output file')
+@click.option('--tracking-result', 'tracking_result_output', default='tracking_result.yml', help='Tracker result output file')
 def test(test_directory, **kwargs):
     coloredlogs.install()
     reader = TrackingDataReader(
@@ -23,8 +23,8 @@ def test(test_directory, **kwargs):
     )
     tracking.track(*reader.tracker_input())
     compare.compare(*reader.compare_input())
-    write_result.write_result(*reader.draw_input())
-    show_result.show_result(reader.show_input())
+    draw_result.write_result(*reader.draw_input())
+    # show_result.show_result(reader.show_input())
 
 
 if __name__ == "__main__":
