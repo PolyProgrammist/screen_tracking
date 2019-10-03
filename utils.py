@@ -52,6 +52,9 @@ class TrackingDataReader:
     def get_video_source(self):
         return self.get_test_description()['sequence']
 
+    def get_video_output(self):
+        return 'out.mp4'
+
     def get_ground_truth(self):
         return self.get_tracking_matrix(self.get_test_description()['ground_truth'])
 
@@ -76,7 +79,11 @@ class TrackingDataReader:
             self.get_model_vertices(),\
             self.get_projection_matrix(),\
             self.get_file_root_relative(self.get_video_source()), \
-            self.get_tracking_result()
+            self.get_tracking_result(), \
+            self.get_file_root_relative(self.get_video_output())
+
+    def show_input(self):
+        return self.get_file_root_relative(self.get_video_output())
 
     def tracker_input(self):
         return \

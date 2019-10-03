@@ -5,7 +5,7 @@ from common import screen_points
 
 reader = TrackingDataReader()
 reader.draw_input()
-model_vertices, projection_matrix, video_source, tracking_result = reader.draw_input()
+model_vertices, projection_matrix, video_source, tracking_result, output_file = reader.draw_input()
 
 
 def to_screen(point):
@@ -21,7 +21,7 @@ width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 print(fps, width, height)
 
-out = cv2.VideoWriter('sources/out.mp4', cv2.VideoWriter_fourcc(*'MP4V'), fps, (width, height))
+out = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*'MP4V'), fps, (width, height))
 
 while cap.isOpened():
     ret, frame = cap.read()

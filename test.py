@@ -3,6 +3,4 @@
 import tracking
 import compare
 import write_result
-
-import subprocess
-subprocess.run(['xdg-open', 'sources/out.mp4'])
+import show_result
