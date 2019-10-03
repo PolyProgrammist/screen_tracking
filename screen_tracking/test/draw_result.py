@@ -34,8 +34,3 @@ def write_result(model_vertices, projection_matrix, video_source, tracking_resul
 
     out.release()
     cap.release()
-
-
-if __name__ == "__main__":
-    reader = TrackingDataReader()
-    write_result(*reader.draw_input())

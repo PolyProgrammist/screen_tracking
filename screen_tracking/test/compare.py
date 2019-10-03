@@ -84,9 +84,3 @@ def compare(model_vertices, projection_matrix, ground_truth, tracking_result):
     log_errors(average_diff, 'Average diff')
 
     logging.error('Untracked frames: ' + str(untracked_frames))
-
-
-if __name__ == "__main__":
-    coloredlogs.install()
-    reader = TrackingDataReader()
-    compare(*reader.compare_input())
