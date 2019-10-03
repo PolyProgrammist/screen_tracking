@@ -1,6 +1,11 @@
 import subprocess
 from utils import TrackingDataReader
 
-reader = TrackingDataReader()
 
-subprocess.run(['xdg-open', reader.show_input()])
+def show_result(video_output):
+    subprocess.run(['xdg-open', video_output])
+
+
+if __name__ == "__main__":
+    reader = TrackingDataReader()
+    show_result(reader.show_input())

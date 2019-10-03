@@ -91,6 +91,7 @@ class TrackingDataReader:
             self.get_projection_matrix(), \
             self.get_file_root_relative(self.get_video_source()), \
             self.generate_user_input_from_ground_truth(), \
+            self.write_result, \
             self.get_file_root_relative(self.TRACKING_RESULT)
 
     def get_resulting_points(self, frames, poses):

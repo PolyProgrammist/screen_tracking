@@ -1,7 +1,7 @@
 import numpy as np
 import transforms3d
 from scipy.spatial import distance
-import logging
+import logging, coloredlogs
 from enum import Enum
 
 from common import normalize_angle, screen_points
@@ -19,7 +19,7 @@ def log_error_if_differ_much(diff, threshold, name):
     if diff > threshold:
         logging.error(external_differ_output)
     else:
-        print(external_differ_output)
+        logging.info(external_differ_output)
 
 
 def log_errors(difference, title):
@@ -68,24 +68,27 @@ def difference(actual, expected, projection, model_vertices):
     return np.array([rotation_diff, translation_diff, points_diff])
 
 
-reader = TrackingDataReader()
-model_vertices, projection_matrix, ground_truth, tracking_result = reader.compare_input()
+def compare(model_vertices, projection_matrix, ground_truth, tracking_result):
+    untracked_frames = []
+    average_diff = np.array([0.0, 0.0, 0.0])
+    for key, value in ground_truth.items():
+        if key in tracking_result:
+            tr = tracking_result[key]
+            gt = value
+            current_diff = difference(tr, gt, projection_matrix, model_vertices)
+            log_errors(current_diff, 'Frame ' + str(key))
+            average_diff += current_diff
+        else:
+            untracked_frames.append(key)
 
-untracked_frames = []
-average_diff = np.array([0.0, 0.0, 0.0])
-for key, value in ground_truth.items():
-    if key in tracking_result:
-        tr = tracking_result[key]
-        gt = value
-        current_diff = difference(tr, gt, projection_matrix, model_vertices)
-        log_errors(current_diff, 'Frame ' + str(key))
-        average_diff += current_diff
-    else:
-        untracked_frames.append(key)
+    frames_number = len(ground_truth.items()) - len(untracked_frames)
+    average_diff /= frames_number
+    log_errors(average_diff, 'Average diff')
 
-frames_number = len(ground_truth.items()) - len(untracked_frames)
-average_diff /= frames_number
-log_errors(average_diff, 'Average diff')
+    logging.error('Untracked frames: ' + str(untracked_frames))
 
 
-logging.error('Untracked frames: ' + str(untracked_frames))
+if __name__ == "__main__":
+    coloredlogs.install()
+    reader = TrackingDataReader()
+    compare(*reader.compare_input())
