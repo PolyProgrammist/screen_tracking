@@ -21,12 +21,12 @@ class TrackingDataReader:
     @lru_cache(None)
     def get_test_description(self):
         with open(self.relative_file(self.test_description)) as fin:
-            return yaml.load(fin)
+            return yaml.load(fin, Loader=yaml.FullLoader)
 
     @lru_cache(None)
     def get_tracking_matrix(self, file):
         with open(self.relative_file(file)) as fin:
-            input_frames = yaml.load(fin)
+            input_frames = yaml.load(fin, Loader=yaml.FullLoader)
             result = {}
             for frame in input_frames:
                 R = np.array(frame['pose']['R'])
