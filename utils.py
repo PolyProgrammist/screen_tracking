@@ -1,5 +1,6 @@
 import yaml
 import numpy as np
+import os
 import pywavefront
 from functools import lru_cache
 from common import screen_points
@@ -8,11 +9,11 @@ np.set_printoptions(precision=3, suppress=True)
 
 
 class TrackingDataReader:
-    def __init__(self, test='sources/'):
+    def __init__(self, test='resources/tests/generated_tv_on'):
         self.__test = test
 
     def get_file_root_relative(self, file):
-        return self.__test + file
+        return os.path.join(self.__test, file)
 
     @lru_cache(None)
     def get_test_description(self):
