@@ -2,7 +2,7 @@
 
 import tracking
 import compare
-import draw_result
+import write_result
 
 import subprocess
 subprocess.run(['xdg-open', 'sources/out.mp4'])

@@ -4,3 +4,4 @@ PyWavefront
 transforms3d
 scipy
 pyyaml
+coloredlogs
