@@ -26,6 +26,7 @@ def test(test_directory, **kwargs):
     tracking.track(*reader.tracker_input())
     compare.compare(*reader.compare_input())
     write_result.write_result(*reader.draw_input())
+
     show_result.show_result(reader.show_input())
 
 
