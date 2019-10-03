@@ -1,6 +1,5 @@
 import cv2
 
-from screen_tracking.common.utils import TrackingDataReader
 from screen_tracking.common.common import screen_points
 
 
