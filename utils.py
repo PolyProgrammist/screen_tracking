@@ -25,7 +25,8 @@ class TrackingDataReader:
 
     @lru_cache(None)
     def get_model_vertices(self):
-        return np.array(pywavefront.Wavefront(self.get_file_root_relative(self.get_test_description()['mesh'])).vertices)
+        return np.array(
+            pywavefront.Wavefront(self.get_file_root_relative(self.get_test_description()['mesh'])).vertices)
 
     @lru_cache(None)
     def get_tracking_matrix(self, file):
@@ -34,7 +35,7 @@ class TrackingDataReader:
             result = {}
             for frame in input:
                 R = np.array(frame['pose']['R'])
-                t = np.array(frame['pose']['t']).reshape((3,1))
+                t = np.array(frame['pose']['t']).reshape((3, 1))
                 result[frame['frame']] = np.hstack((R, t))
             return result
 
@@ -67,15 +68,15 @@ class TrackingDataReader:
 
     def compare_input(self):
         return \
-            self.get_model_vertices(),\
-            self.get_projection_matrix(),\
-            self.get_ground_truth(),\
+            self.get_model_vertices(), \
+            self.get_projection_matrix(), \
+            self.get_ground_truth(), \
             self.get_tracking_result()
 
     def draw_input(self):
         return \
-            self.get_model_vertices(),\
-            self.get_projection_matrix(),\
+            self.get_model_vertices(), \
+            self.get_projection_matrix(), \
             self.get_file_root_relative(self.get_video_source()), \
             self.get_tracking_result(), \
             self.get_file_root_relative(self.video_output)
