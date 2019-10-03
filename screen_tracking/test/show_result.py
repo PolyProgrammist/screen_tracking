@@ -1,5 +1,5 @@
 import subprocess
-from utils import TrackingDataReader
+from screen_tracking.common.utils import TrackingDataReader
 
 
 def show_result(video_output):

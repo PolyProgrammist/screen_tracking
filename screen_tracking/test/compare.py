@@ -2,10 +2,9 @@ import numpy as np
 import transforms3d
 from scipy.spatial import distance
 import logging, coloredlogs
-from enum import Enum
 
-from common import normalize_angle, screen_points
-from utils import TrackingDataReader
+from screen_tracking.common.common import normalize_angle, screen_points
+from screen_tracking.common.utils import TrackingDataReader
 
 DIFFERENCE_PARAMETERS = [
     (0.04, 'External parameters rotation'),

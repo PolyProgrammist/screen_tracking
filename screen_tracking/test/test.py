@@ -3,12 +3,10 @@
 import coloredlogs
 import click
 
-import tracking
-import compare
-import write_result
-import show_result
+from screen_tracking.tracker import tracking
+from screen_tracking.test import write_result, show_result, compare
 
-from utils import TrackingDataReader
+from screen_tracking.common.utils import TrackingDataReader
 
 
 @click.command()

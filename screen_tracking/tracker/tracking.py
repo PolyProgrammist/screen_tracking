@@ -1,13 +1,7 @@
-import math
 import cv2
-import pywavefront
-import logging
-import transforms3d
 import numpy as np
-from scipy.spatial import distance
 
-from utils import TrackingDataReader
-from common import screen_points
+from screen_tracking.common.utils import TrackingDataReader
 
 
 class Tracker:
