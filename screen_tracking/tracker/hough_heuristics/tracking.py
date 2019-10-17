@@ -23,7 +23,7 @@ class Tracker:
             for j in range(4):
                 cur_length = np.linalg.norm(last_points[i] - last_points[j])
                 length = max(length, cur_length)
-        offset_len = length / 3
+        offset_len = length / 5
         dxs = [-1, 0, 1, 0]
         dys = [0, 1, 0, -1]
         offsets = [[offset_len * dx, offset_len * dy] for dx, dy in zip(dxs, dys)]
@@ -44,16 +44,74 @@ class Tracker:
         min_x, max_x, min_y, max_y = bbox
         return frame[min_y:max_y, min_x:max_x, :]
 
+    def adjust_vector(self, vector):
+        result = vector.copy()
+        result /= np.linalg.norm(result)
+        if result[0] < 0:
+            result *= -1
+        return result
+
+    def points_to_abc(self, p1, p2):
+        x1, y1 = p1
+        x2, y2 = p2
+        a = y2 - y1
+        b = x1 - x2
+        c = a * x1 + b * y1
+        ar = np.array([a, b, c])
+        ar = self.adjust_vector(ar)
+        return ar
+
+    def screen_points_to_lines(self, last_points):
+        lines = []
+        for i in range(4):
+            lines.append(self.points_to_abc(last_points[i], last_points[(i + 1) % 4]))
+        return lines
+
+    def hough_lines(self, cur_frame):
+        gray = cv2.cvtColor(cur_frame, cv2.COLOR_BGR2GRAY)
+        edges = cv2.Canny(gray, 50, 150, apertureSize=3)
+        minLineLength = 100
+        maxLineGap = 30
+        lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 100, minLineLength=minLineLength, maxLineGap=maxLineGap)
+        lines = [line[0].astype(float) for line in lines]
+        lines_abc = [self.points_to_abc(line[:2], line[2:4]) for line in lines]
+        return lines_abc, lines
+
+    def near_lines(self, a, b):
+        return np.linalg.norm(a - b)
+
+    def filter_lines(self, last_lines, candidates_abc, candidates):
+        result = []
+        for candidate_abc, candidate in zip(candidates_abc, candidates):
+            min_near = min(self.near_lines(last_line, candidate_abc) for last_line in last_lines)
+            result.append((min_near, candidate_abc, candidate))
+        result = sorted(result, key=lambda x: x[0])
+        result = result[:20]
+        nearest_abc = [r[1] for r in result]
+        nearest = [r[2] for r in result]
+        return nearest_abc, nearest
+
+    def show(self, lines, frame):
+        to_show = frame.copy()
+        for line in lines:
+            line = line.astype(int)
+            cv2.line(to_show, (line[0], line[1]), (line[2], line[3]), color=(0, 0, 255))
+        cv2.imshow('frame', to_show)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
     def get_points(self, cur_frame, last_frame, last_points):
         bbox = self.get_bounding_box(cur_frame, last_points)
+        bbox = (0, cur_frame.shape[1], 0, cur_frame.shape[0])
+
         cur_frame = self.cut(cur_frame, bbox)
         last_frame = self.cut(last_frame, bbox)
-        last_lines = lines(points)
-        last_hough_peaks = hough_parameters(last_lines)
-        cur_hough_peaks_candidates = hough_line_peaks(cur_frame)
-        cur_hough_peaks_candidates = nearest(cur_hough_peaks_candidates, last_hough_peaks)
-        cur_hough_peaks_candidates = most_common_3(cur_hough_peaks_candidates, last_hough_peaks)
-        cur_abc = hough_to_abc(cur_hough_peaks_candidates)
+        last_lines = self.screen_points_to_lines(last_points)
+        hough_lines_abc, hough_lines = self.hough_lines(cur_frame)
+        line_candidates_abc, line_candidates = self.filter_lines(last_lines, hough_lines_abc, hough_lines)
+        self.show(line_candidates, last_frame)
+        print(len(line_candidates))
+        print(len(hough_lines))
         cur_abc = best_paralellogram(cur_abc)
         cur_points = points_from_lines(cur_abc)
         return cur_points

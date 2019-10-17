@@ -2,6 +2,7 @@
 
 import coloredlogs
 import click
+import numpy as np
 
 from screen_tracking.common.utils import TrackingDataReader
 from screen_tracking.tracker.example import tracking as example_tracking
@@ -21,6 +22,7 @@ from screen_tracking.test import draw_result, show_result, compare
               help='Steps to execute. Possible steps are: tracking, compare, write_video, show_video')
 @click.option('-a', '--algorithm', type=click.Choice(['example', 'hough']), default='hough')
 def test(test_directory, steps, algorithm, **kwargs):
+    np.random.seed(42)
     coloredlogs.install()
     reader = TrackingDataReader(
         test_directory,
