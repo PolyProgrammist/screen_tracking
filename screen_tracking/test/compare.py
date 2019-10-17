@@ -81,5 +81,7 @@ def compare(model_vertices, projection_matrix, ground_truth, tracking_result):
     frames_number = len(ground_truth.items()) - len(untracked_frames)
     average_diff /= frames_number
     log_errors(average_diff, 'Average diff')
-
-    logging.error('Untracked frames: ' + str(untracked_frames))
+    if untracked_frames:
+        logging.error('Untracked frames: ' + str(untracked_frames))
+    else:
+        logging.info('No untracked frames')

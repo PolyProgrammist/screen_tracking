@@ -2,9 +2,11 @@
 
 import coloredlogs
 import click
+import numpy as np
 
 from screen_tracking.common.utils import TrackingDataReader
-from screen_tracking.tracker import tracking
+from screen_tracking.tracker.example import tracking as example_tracking
+from screen_tracking.tracker.hough_heuristics import tracking as hough_tracking
 
 from screen_tracking.test import draw_result, show_result, compare
 
@@ -18,14 +20,19 @@ from screen_tracking.test import draw_result, show_result, compare
               help='Tracker result output file')
 @click.option('-s', '--steps', multiple=True, default=['tracking', 'compare', 'write_video', 'show_video'],
               help='Steps to execute. Possible steps are: tracking, compare, write_video, show_video')
-def test(test_directory, steps, **kwargs):
+@click.option('-a', '--algorithm', type=click.Choice(['example', 'hough']), default='hough')
+def test(test_directory, steps, algorithm, **kwargs):
+    np.random.seed(42)
     coloredlogs.install()
     reader = TrackingDataReader(
         test_directory,
         **kwargs
     )
     if 'tracking' in steps:
-        tracking.track(*reader.tracker_input())
+        if algorithm == 'example':
+            example_tracking.track(*reader.tracker_input())
+        if algorithm == 'hough':
+            hough_tracking.track(*reader.tracker_input())
     if 'compare' in steps:
         compare.compare(*reader.compare_input())
     if 'write_video' in steps:
