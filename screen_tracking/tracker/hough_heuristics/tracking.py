@@ -57,8 +57,7 @@ class Tracker:
         a = y2 - y1
         b = x1 - x2
         c = a * x1 + b * y1
-        ar = np.array([a, b, c])
-        ar = self.adjust_vector(ar)
+        ar = self.adjust_vector(np.array([a, b, c]))
         return ar
 
     def screen_points_to_lines(self, last_points):
@@ -86,7 +85,7 @@ class Tracker:
             min_near = min(self.near_lines(last_line, candidate_abc) for last_line in last_lines)
             result.append((min_near, candidate_abc, candidate))
         result = sorted(result, key=lambda x: x[0])
-        result = result[:20]
+        result = result[:10]
         nearest_abc = [r[1] for r in result]
         nearest = [r[2] for r in result]
         return nearest_abc, nearest
