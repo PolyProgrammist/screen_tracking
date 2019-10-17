@@ -108,7 +108,7 @@ class Tracker:
         last_lines = self.screen_points_to_lines(last_points)
         hough_lines_abc, hough_lines = self.hough_lines(cur_frame)
         line_candidates_abc, line_candidates = self.filter_lines(last_lines, hough_lines_abc, hough_lines)
-        self.show(line_candidates, last_frame)
+        self.show(line_candidates, cur_frame)
         print(len(line_candidates))
         print(len(hough_lines))
         cur_abc = best_paralellogram(cur_abc)
