@@ -4,7 +4,7 @@ import coloredlogs
 import click
 
 from screen_tracking.common.utils import TrackingDataReader
-from screen_tracking.tracker import tracking
+from screen_tracking.tracker.example import tracking
 
 from screen_tracking.test import draw_result, show_result, compare
 

@@ -6,3 +6,4 @@ scipy
 pyyaml
 coloredlogs
 click
+scikit-image
