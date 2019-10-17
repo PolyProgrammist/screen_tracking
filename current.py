@@ -2,26 +2,17 @@ import cv2
 
 from screen_tracking.common.utils import TrackingDataReader
 import numpy as np
-from skimage.transform import hough_line, hough_line_peaks
+from skimage.transform import hough_line, probabilistic_hough_line
 
 reader = TrackingDataReader('resources/tests/generated_tv_on', test_description='test_description.yml')
 video_file = reader.relative_file(reader.get_sequence_file())
 cap = cv2.VideoCapture(video_file)
 
+ret, frame1 = cap.read()
+ret, frame2 = cap.read()
 
-def get_points(current_image, previous_image, previous_points):
-    bbox = get_bounding_box(current_image, previous_points)
-    current_image = cut(current_image, bbox)
-    previous_image = cut(previous_image, bbox)
-    previous_lines = lines(points)
-    previous_hough_peaks = hough_parameters(previous_lines)
-    current_hough_peaks_candidates = hough_line_peaks(current_image)
-    current_hough_peaks_candidates = nearest(current_hough_peaks_candidates, previous_hough_peaks)
-    current_hough_peaks_candidates = most_common_3(current_hough_peaks_candidates, previous_hough_peaks)
-    current_hough_peaks = best_paralellogram(current_hough_peaks_candidates)
-    current_points = points_from_lines()
-    return current_points
 
+#
 
 def draw_lines(img, houghLines, thickness=2):
     color = [0, 0, 255]
@@ -44,8 +35,6 @@ def go_frame(cnt):
     # img = np.zeros()
 
     hough = np.log(1 + h)
-    print(hough.shape)
-    print(np.max(hough))
     hough /= np.max(hough)
     hough = hough * 255
     hough = hough.astype(np.uint8)
@@ -53,10 +42,7 @@ def go_frame(cnt):
     hough_add = np.zeros(hough.shape, dtype=np.uint8)
     hough_add = cv2.cvtColor(hough_add, cv2.COLOR_GRAY2BGR)
     for _, angle, dist in zip(*hough_line_peaks(h, theta, d, threshold=0.2 * np.max(h))):
-        print(angle, _)
-        y = _
-        x = angle * 360 / np.math.pi
-        cv2.circle(hough_add, (int(x), int(y)), 3, [0, 255, 0], 3)
+        y0, y1 = (dist - origin * np.cos(angle)) / np.sin(angle)
 
     hough = cv2.cvtColor(hough, cv2.COLOR_GRAY2BGR)
     cv2.imshow('hough', hough)
