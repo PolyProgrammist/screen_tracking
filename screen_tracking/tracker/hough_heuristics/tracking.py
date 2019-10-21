@@ -47,8 +47,6 @@ class Tracker:
     def adjust_vector(self, vector):
         result = vector.copy()
         result /= np.linalg.norm(result)
-        if result[0] < 0:
-            result *= -1
         return result
 
     def points_to_abc(self, p1, p2):
@@ -81,13 +79,13 @@ class Tracker:
         return np.array(lines)
 
     def near_lines(self, a, b):
-        return np.linalg.norm(a - b)
+        return min(np.linalg.norm(a - b), np.linalg.norm(-a - b))
 
     def collinear(self, line, candidate):
-        print(line, candidate)
         line_abc = self.adjust_vector(self.points_to_abc(line[0], line[1]))
         candidate_abc = self.adjust_vector(self.points_to_abc(candidate[0], candidate[1]))
-        return self.near_lines(line_abc, candidate_abc) < 0.000001
+        value = self.near_lines(line_abc, candidate_abc) < 0.00015
+        return value
 
     def filter_lines(self, last_lines, candidates, predicate):
         return [candidate for candidate in candidates if predicate(last_lines, candidate)]
@@ -103,15 +101,16 @@ class Tracker:
 
     def get_points(self, cur_frame, last_frame, last_points):
         last_lines = self.screen_points_to_lines(last_points)
+        print(self.adjust_vector(self.points_to_abc(last_lines[2][0], last_lines[2][1])))
         hough_lines = self.hough_lines(cur_frame, self.get_bounding_box(cur_frame, last_points))
         candidates = [hough_lines.copy(), hough_lines.copy(), hough_lines.copy(), hough_lines.copy()]
-        print(len(hough_lines))
         result = []
         for line, candidate in zip(last_lines, candidates):
             candidate = self.filter_lines(line, candidate, self.collinear)
             result.append(candidate)
-        self.show(candidates[0], cur_frame)
-        # print(len(c))
+        # print(last_lines[2])
+        # print(result[2])
+        self.show(result[0], cur_frame)
         return True
 
     def write_camera(self, tracking_result, pixels, frame):
