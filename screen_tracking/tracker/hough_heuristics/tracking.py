@@ -65,6 +65,8 @@ class Tracker:
             lines.append([last_points[i], last_points[(i + 1) % 4]])
         return np.array(lines)
 
+    # def screen_lines_to_points(self, lines):
+
     def hough_lines(self, cur_frame_init, bbox):
         cur_frame = self.cut(cur_frame_init, bbox)
         gray = cv2.cvtColor(cur_frame, cv2.COLOR_BGR2GRAY)
@@ -84,11 +86,14 @@ class Tracker:
     def collinear(self, line, candidate):
         line_abc = self.adjust_vector(self.points_to_abc(line[0], line[1]))
         candidate_abc = self.adjust_vector(self.points_to_abc(candidate[0], candidate[1]))
-        value = self.near_lines(line_abc, candidate_abc) < 0.00015
+        value = self.near_lines(line_abc, candidate_abc)
         return value
 
     def filter_lines(self, last_lines, candidates, predicate):
-        return [candidate for candidate in candidates if predicate(last_lines, candidate)]
+        return np.array(sorted(candidates.tolist(), key=lambda candidate: predicate(last_lines, candidate))[:1])
+
+    def get_only_lines(self, line, candidates):
+        return candidates[0]
 
     def show(self, lines, frame):
         to_show = frame.copy()
@@ -107,10 +112,11 @@ class Tracker:
         result = []
         for line, candidate in zip(last_lines, candidates):
             candidate = self.filter_lines(line, candidate, self.collinear)
-            result.append(candidate)
+            result.append(self.get_only_lines(line, candidate))
         # print(last_lines[2])
         # print(result[2])
-        self.show(result[0], cur_frame)
+        self.show(result, cur_frame)
+
         return True
 
     def write_camera(self, tracking_result, pixels, frame):
