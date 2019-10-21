@@ -57,14 +57,15 @@ class Tracker:
         a = y2 - y1
         b = x1 - x2
         c = a * x1 + b * y1
-        ar = self.adjust_vector(np.array([a, b, c]))
+        ar = np.array([a, b, c])
+        # ar = self.adjust_vector(ar)
         return ar
 
     def screen_points_to_lines(self, last_points):
         lines = []
         for i in range(4):
-            lines.append(self.points_to_abc(last_points[i], last_points[(i + 1) % 4]))
-        return lines
+            lines.append([last_points[i], last_points[(i + 1) % 4]])
+        return np.array(lines)
 
     def hough_lines(self, cur_frame_init, bbox):
         cur_frame = self.cut(cur_frame_init, bbox)
@@ -72,45 +73,46 @@ class Tracker:
         edges = cv2.Canny(gray, 50, 150, apertureSize=3)
         minLineLength = 100
         maxLineGap = 30
-        lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 100, minLineLength=minLineLength, maxLineGap=maxLineGap)
+        threshold = 100
+        lines = cv2.HoughLinesP(edges, 1, np.pi / 180, threshold, minLineLength=minLineLength, maxLineGap=maxLineGap)
         lines = [line[0].astype(float) for line in lines]
         lines = [line + np.array([bbox[0], bbox[1], bbox[0], bbox[1]]) for line in lines]
-        lines_abc = [self.points_to_abc(line[:2], line[2:4]) for line in lines]
-        return lines_abc, lines
+        lines = [[line[:2], line[2:]] for line in lines]
+        return np.array(lines)
 
     def near_lines(self, a, b):
         return np.linalg.norm(a - b)
 
-    def filter_lines(self, last_lines, candidates_abc, candidates):
-        result = []
-        for candidate_abc, candidate in zip(candidates_abc, candidates):
-            min_near = min(self.near_lines(last_line, candidate_abc) for last_line in last_lines)
-            result.append((min_near, candidate_abc, candidate))
-        result = sorted(result, key=lambda x: x[0])
-        result = result[:15]
-        nearest_abc = [r[1] for r in result]
-        nearest = [r[2] for r in result]
-        return nearest_abc, nearest
+    def collinear(self, line, candidate):
+        print(line, candidate)
+        line_abc = self.adjust_vector(self.points_to_abc(line[0], line[1]))
+        candidate_abc = self.adjust_vector(self.points_to_abc(candidate[0], candidate[1]))
+        return self.near_lines(line_abc, candidate_abc) < 0.000001
+
+    def filter_lines(self, last_lines, candidates, predicate):
+        return [candidate for candidate in candidates if predicate(last_lines, candidate)]
 
     def show(self, lines, frame):
         to_show = frame.copy()
         for line in lines:
             line = line.astype(int)
-            cv2.line(to_show, (line[0], line[1]), (line[2], line[3]), color=(0, 0, 255))
+            cv2.line(to_show, tuple(line[0]), tuple(line[1]), color=(0, 0, 255))
         cv2.imshow('frame', to_show)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
     def get_points(self, cur_frame, last_frame, last_points):
         last_lines = self.screen_points_to_lines(last_points)
-        hough_lines_abc, hough_lines = self.hough_lines(cur_frame, self.get_bounding_box(cur_frame, last_points))
-        line_candidates_abc, line_candidates = self.filter_lines(last_lines, hough_lines_abc, hough_lines)
-        self.show(line_candidates, cur_frame)
-        print(len(line_candidates))
+        hough_lines = self.hough_lines(cur_frame, self.get_bounding_box(cur_frame, last_points))
+        candidates = [hough_lines.copy(), hough_lines.copy(), hough_lines.copy(), hough_lines.copy()]
         print(len(hough_lines))
-        cur_abc = best_paralellogram(cur_abc)
-        cur_points = points_from_lines(cur_abc)
-        return cur_points
+        result = []
+        for line, candidate in zip(last_lines, candidates):
+            candidate = self.filter_lines(line, candidate, self.collinear)
+            result.append(candidate)
+        self.show(candidates[0], cur_frame)
+        # print(len(c))
+        return True
 
     def write_camera(self, tracking_result, pixels, frame):
         _, rotation, translation = cv2.solvePnP(self.model_vertices, pixels, self.camera_params, np.array([]))
