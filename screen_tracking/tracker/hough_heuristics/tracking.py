@@ -34,15 +34,15 @@ class Tracker:
         min_y = np.clip(min(p[1] for p in points), 0, cur_frame.shape[0])
         max_y = np.clip(max(p[1] for p in points), 0, cur_frame.shape[0])
 
-        result = min_x, max_x, min_y, max_y
+        result = min_x, min_y, max_x, max_y
 
         result = tuple(map(int, result))
 
         return result
 
     def cut(self, frame, bbox):
-        min_x, max_x, min_y, max_y = bbox
-        return frame[min_y:max_y, min_x:max_x, :]
+        min_x, min_y, max_x, max_y = bbox
+        return frame.copy()[min_y:max_y, min_x:max_x, :]
 
     def adjust_vector(self, vector):
         result = vector.copy()
@@ -66,13 +66,15 @@ class Tracker:
             lines.append(self.points_to_abc(last_points[i], last_points[(i + 1) % 4]))
         return lines
 
-    def hough_lines(self, cur_frame):
+    def hough_lines(self, cur_frame_init, bbox):
+        cur_frame = self.cut(cur_frame_init, bbox)
         gray = cv2.cvtColor(cur_frame, cv2.COLOR_BGR2GRAY)
         edges = cv2.Canny(gray, 50, 150, apertureSize=3)
         minLineLength = 100
         maxLineGap = 30
         lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 100, minLineLength=minLineLength, maxLineGap=maxLineGap)
         lines = [line[0].astype(float) for line in lines]
+        lines = [line + np.array([bbox[0], bbox[1], bbox[0], bbox[1]]) for line in lines]
         lines_abc = [self.points_to_abc(line[:2], line[2:4]) for line in lines]
         return lines_abc, lines
 
@@ -85,7 +87,7 @@ class Tracker:
             min_near = min(self.near_lines(last_line, candidate_abc) for last_line in last_lines)
             result.append((min_near, candidate_abc, candidate))
         result = sorted(result, key=lambda x: x[0])
-        result = result[:10]
+        result = result[:15]
         nearest_abc = [r[1] for r in result]
         nearest = [r[2] for r in result]
         return nearest_abc, nearest
@@ -100,13 +102,8 @@ class Tracker:
         cv2.destroyAllWindows()
 
     def get_points(self, cur_frame, last_frame, last_points):
-        bbox = self.get_bounding_box(cur_frame, last_points)
-        bbox = (0, cur_frame.shape[1], 0, cur_frame.shape[0])
-
-        cur_frame = self.cut(cur_frame, bbox)
-        last_frame = self.cut(last_frame, bbox)
         last_lines = self.screen_points_to_lines(last_points)
-        hough_lines_abc, hough_lines = self.hough_lines(cur_frame)
+        hough_lines_abc, hough_lines = self.hough_lines(cur_frame, self.get_bounding_box(cur_frame, last_points))
         line_candidates_abc, line_candidates = self.filter_lines(last_lines, hough_lines_abc, hough_lines)
         self.show(line_candidates, cur_frame)
         print(len(line_candidates))
