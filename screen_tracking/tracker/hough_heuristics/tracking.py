@@ -3,6 +3,14 @@ import numpy as np
 
 
 class Tracker:
+    MARGIN_FRACTION = 1 / 5
+    CANNY_THRESHOLD_1 = 50
+    CANNY_THRESHOLD_2 = 150
+    MIN_LINE_LENGTH = 100
+    MAX_LINE_GAP = 30
+    THRESHOLD_HOUGH_LINES_P = 60
+    APERTURE_SIZE = 3
+
     def __init__(self, model_vertices, camera_params, video_source, frame_pixels):
         self.model_vertices = model_vertices
         self.camera_params = camera_params
@@ -10,14 +18,12 @@ class Tracker:
         self.frame_pixels = frame_pixels
 
     def get_bounding_box(self, cur_frame, last_points):
-        margin_fraction = 1 / 5
-
         length = 0
         for i in range(4):
             for j in range(4):
                 cur_length = np.linalg.norm(last_points[i] - last_points[j])
                 length = max(length, cur_length)
-        offset_len = length * margin_fraction
+        offset_len = length * self.MARGIN_FRACTION
         dxs = [-1, 0, 1, 0]
         dys = [0, 1, 0, -1]
         offsets = [[offset_len * dx, offset_len * dy] for dx, dy in zip(dxs, dys)]
@@ -79,17 +85,11 @@ class Tracker:
         return np.array([x, y])
 
     def hough_lines(self, cur_frame_init, bbox):
-        canny_threshold1 = 50
-        canny_threshold2 = 150
-        minLineLength = 100
-        maxLineGap = 30
-        threshold_hough_lines_p = 100
-
         cur_frame = self.cut(cur_frame_init, bbox)
         gray = cv2.cvtColor(cur_frame, cv2.COLOR_BGR2GRAY)
-        edges = cv2.Canny(gray, canny_threshold1, canny_threshold2, apertureSize=3)
-        lines = cv2.HoughLinesP(edges, 1, np.pi / 180, threshold_hough_lines_p, minLineLength=minLineLength,
-                                maxLineGap=maxLineGap)
+        edges = cv2.Canny(gray, self.CANNY_THRESHOLD_1, self.CANNY_THRESHOLD_2, apertureSize=self.APERTURE_SIZE)
+        lines = cv2.HoughLinesP(edges, 1, np.pi / 180, self.THRESHOLD_HOUGH_LINES_P, minLineLength=self.MIN_LINE_LENGTH,
+                                maxLineGap=self.MAX_LINE_GAP)
         lines = [line[0].astype(float) for line in lines]
         lines = [line + np.array([bbox[0], bbox[1], bbox[0], bbox[1]]) for line in lines]
         lines = [[line[:2], line[2:]] for line in lines]
@@ -105,7 +105,7 @@ class Tracker:
         return value
 
     def filter_lines(self, last_lines, candidates, predicate):
-        return np.array(sorted(candidates.tolist(), key=lambda candidate: predicate(last_lines, candidate))[:1])
+        return np.array(sorted(candidates.tolist(), key=lambda candidate: predicate(last_lines, candidate))[:100])
 
     def get_only_lines(self, line, candidates):
         return candidates[0]
@@ -114,7 +114,7 @@ class Tracker:
         to_show = frame.copy()
         for line in lines:
             line = line.astype(int)
-            cv2.line(to_show, tuple(line[0]), tuple(line[1]), color=(0, 0, 255), thickness=2)
+            cv2.line(to_show, tuple(line[0]), tuple(line[1]), color=(0, 0, 255), thickness=1)
         for point in points:
             cv2.circle(to_show, tuple(point.astype(int)), 5, color=(0, 255, 0), thickness=-1)
         cv2.imshow('frame', to_show)
