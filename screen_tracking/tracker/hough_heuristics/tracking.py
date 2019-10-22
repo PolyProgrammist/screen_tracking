@@ -65,7 +65,27 @@ class Tracker:
             lines.append([last_points[i], last_points[(i + 1) % 4]])
         return np.array(lines)
 
-    # def screen_lines_to_points(self, lines):
+    def lines_intersection(self, line1, line2):
+        xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
+        ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
+
+        def det(a, b):
+            return a[0] * b[1] - a[1] * b[0]
+
+        div = det(xdiff, ydiff)
+        if div == 0:
+            raise Exception('lines do not intersect')
+
+        d = (det(*line1), det(*line2))
+        x = det(d, xdiff) / div
+        y = det(d, ydiff) / div
+        return np.array([x, y])
+
+    def screen_lines_to_points(self, lines):
+        intersections = []
+        for i in range(3, 7):
+            intersections.append(self.lines_intersection(lines[i % 4], lines[(i + 1) % 4]))
+        return np.array(intersections)
 
     def hough_lines(self, cur_frame_init, bbox):
         cur_frame = self.cut(cur_frame_init, bbox)
@@ -95,29 +115,29 @@ class Tracker:
     def get_only_lines(self, line, candidates):
         return candidates[0]
 
-    def show(self, lines, frame):
+    def show(self, lines, frame, points):
         to_show = frame.copy()
         for line in lines:
             line = line.astype(int)
-            cv2.line(to_show, tuple(line[0]), tuple(line[1]), color=(0, 0, 255))
+            cv2.line(to_show, tuple(line[0]), tuple(line[1]), color=(0, 0, 255), thickness=2)
+        for point in points:
+            cv2.circle(to_show, tuple(point.astype(int)), 5, color=(0, 255, 0), thickness=-1)
         cv2.imshow('frame', to_show)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
     def get_points(self, cur_frame, last_frame, last_points):
         last_lines = self.screen_points_to_lines(last_points)
-        print(self.adjust_vector(self.points_to_abc(last_lines[2][0], last_lines[2][1])))
         hough_lines = self.hough_lines(cur_frame, self.get_bounding_box(cur_frame, last_points))
         candidates = [hough_lines.copy(), hough_lines.copy(), hough_lines.copy(), hough_lines.copy()]
         result = []
         for line, candidate in zip(last_lines, candidates):
             candidate = self.filter_lines(line, candidate, self.collinear)
             result.append(self.get_only_lines(line, candidate))
-        # print(last_lines[2])
-        # print(result[2])
-        self.show(result, cur_frame)
+        intersections = self.screen_lines_to_points(result)
+        # self.show(result, cur_frame, intersections)
 
-        return True
+        return intersections
 
     def write_camera(self, tracking_result, pixels, frame):
         _, rotation, translation = cv2.solvePnP(self.model_vertices, pixels, self.camera_params, np.array([]))
@@ -131,18 +151,22 @@ class Tracker:
         cap = cv2.VideoCapture(self.video_source)
 
         ret, last_frame = cap.read()
-        last_points = self.frame_pixels[1]
-        self.write_camera(tracking_result, last_points, 1)
+        last_frame = [last_frame]
+        last_points = [self.frame_pixels[1]]
+        self.write_camera(tracking_result, last_points[0], 1)
         frame_number = 2
+        # print(last_points[0])
 
         while cap.isOpened():
             ret, frame = cap.read()
-            points = self.get_points(frame, last_frame, last_points)
+            if not ret:
+                break
+            points = self.get_points(frame, last_frame[0], last_points[0])
+            # print(points)
             self.write_camera(tracking_result, points, frame_number)
-            last_points = points
-            last_frame = frame
+            last_points[0] = points
+            last_frame[0] = frame
             frame_number += 1
-            break
 
         return tracking_result
 
