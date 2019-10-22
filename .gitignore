@@ -1,5 +1,7 @@
 .idea
-*.mp4
 *.pdf
 venv
 *__pycache__
+*tmp
+*tracking_result.yml
+*out.mp4
