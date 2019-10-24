@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 
 from screen_tracking.common.common import normalize_angle, screen_points
+from screen_tracking.test.compare import difference as external_matrices_difference
 
 
 class TrackerParams:
@@ -168,8 +169,12 @@ class Tracker:
         points = self.get_screen_points(external_matrix)
         return np.linalg.norm(points - intersections)
 
-    def previous_matrix_diff(self, lines):
-        intersectinos = self.screen_lines_to_points(lines)
+    def previous_matrix_diff(self, lines, last_points):
+        intersections = self.screen_lines_to_points(lines)
+        previous_external_matrix = self.get_external_matrix(last_points)
+        current_external_matrix = self.get_external_matrix(intersections)
+        diff = external_matrices_difference(current_external_matrix, previous_external_matrix, self.camera_params, self.model_vertices)
+        print(diff)
 
     def best_rectangle(self, candidates):
         # print(np.array(candidates).shape)
@@ -238,7 +243,8 @@ class Tracker:
             last_frame[0] = frame
             frame_number += 1
             print(frame_number)
-            if frame_number == 84:
+            # break
+            if frame_number == 10:
                 break
 
         return tracking_result
