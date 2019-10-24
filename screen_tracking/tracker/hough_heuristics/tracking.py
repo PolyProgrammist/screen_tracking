@@ -12,7 +12,7 @@ class TrackerParams:
     MARGIN_FRACTION = 1 / 5
     CANNY_THRESHOLD_1 = 50
     CANNY_THRESHOLD_2 = 150
-    MIN_LINE_LENGTH = 100
+    MIN_LINE_LENGTH = 50
     MAX_LINE_GAP = 30
     THRESHOLD_HOUGH_LINES_P = 50
     APERTURE_SIZE = 3
@@ -167,6 +167,19 @@ class Tracker:
         intersections = self.screen_lines_to_points(lines)
         external_matrix = self.get_external_matrix(intersections)
         points = self.get_screen_points(external_matrix)
+        if external_matrices_difference(external_matrix, self.tracker_params.gt2, self.camera_params, self.model_vertices)[2] < 0.03:
+            print(np.linalg.norm(points - intersections))
+            print('yahoo')
+            cur_points = self.get_screen_points(external_matrix)
+            frame = self.cur_frame.copy()
+            for i, point in enumerate(cur_points):
+                from screen_tracking.test.draw_result import to_screen
+                cv2.circle(frame, to_screen(point), 3, (0, 0, 255), -1)
+                cv2.line(frame, to_screen(cur_points[i]), to_screen(cur_points[(i + 1) % len(cur_points)]), (0, 0, 255))
+            cv2.imshow('best', frame)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+
         return np.linalg.norm(points - intersections)
 
     def previous_matrix_diff(self, lines, last_points):
@@ -177,35 +190,29 @@ class Tracker:
         print(diff)
 
     def best_rectangle(self, candidates):
-        # print(np.array(candidates).shape)
-        best_score = -1
-        best_lines = []
+        candidate_rectangles = list(itertools.product(*candidates))
+        print(len(candidate_rectangles))
         rmses = []
-        for current in itertools.product(*candidates):
-            # print(current.shape)
-            rmse = self.pnp_rmse(current)
-            if best_score == -1 or rmse < best_score:
-                best_score = rmse
-                best_lines = current
-        # print(sorted(rmses[:5]))
-        return best_lines
+        rmses = np.array(list(map(self.pnp_rmse, candidate_rectangles)))
+        indices = list(range(len(candidate_rectangles)))
+        indices = sorted(indices, key=lambda x: rmses[x])
+        print(rmses[indices[:100]])
+        return candidate_rectangles[indices[9]]
 
     def get_points(self, cur_frame, last_frame, last_points):
+        self.cur_frame = cur_frame
         last_lines = self.screen_points_to_lines(last_points)
         hough_lines = self.hough_lines(cur_frame, self.get_bounding_box(cur_frame, last_points))
         candidates = [hough_lines.copy(), hough_lines.copy(), hough_lines.copy(), hough_lines.copy()]
         result = []
-        # candidates[3] = self.filter_lines(last_lines[3], candidates[3], self.collinear_predicate, max_diff=0.3)
-        # result = self.filter_lines(last_lines[3], candidates[3], self.distance_origin_near_predicate, max_diff=100)
         for _, (line, candidate) in enumerate(zip(last_lines, candidates)):
-            candidate = self.filter_lines(line, candidate, self.distance_origin_near_predicate, max_diff=30)
+            candidate = self.filter_lines(line, candidate, self.distance_origin_near_predicate, max_diff=100)
             candidate = self.filter_lines(line, candidate, self.collinear_predicate, max_diff=0.1)
-            candidate = self.filter_lines(line, candidate, self.combine_predicate, max_diff=100000, max_number=10000)[
-                        :10]
+            candidate = self.filter_lines(line, candidate, self.combine_predicate, max_diff=100000, max_number=10000)
             result.append(candidate)
 
         result = self.best_rectangle(np.array(result))
-
+        #
         intersections = self.screen_lines_to_points(result)
         # intersections = []
         # result = result[1:1]
@@ -241,11 +248,11 @@ class Tracker:
             self.write_camera(tracking_result, points, frame_number)
             last_points[0] = points
             last_frame[0] = frame
-            frame_number += 1
             print(frame_number)
-            # break
-            if frame_number == 10:
+            if frame_number == 2:
                 break
+            frame_number += 1
+            # break
 
         return tracking_result
 

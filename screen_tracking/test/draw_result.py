@@ -28,6 +28,10 @@ def write_result(model_vertices, projection_matrix, video_source, tracking_resul
                     cv2.line(frame, to_screen(points[i]), to_screen(points[(i + 1) % len(points)]), (0, 0, 255))
 
             out.write(frame)
+            if frame_number == 2:
+                cv2.imshow('2 frame', frame)
+                cv2.waitKey(0)
+                cv2.destroyAllWindows()
         else:
             break
 
