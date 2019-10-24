@@ -12,7 +12,7 @@ def screen_points(camera_params, external_matrix, model_vertices):
     return points
 
 
-def normalize_angle(angle):
-    angle %= 2 * math.pi
-    angle = min(angle, 2 * math.pi - angle)
+def normalize_angle(angle, round=2 * math.pi):
+    angle %= round
+    angle = min(angle, round - angle)
     return angle

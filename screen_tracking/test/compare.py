@@ -22,7 +22,7 @@ def log_error_if_differ_much(diff, threshold, name):
 
 
 def log_errors(difference, title):
-    print(title + ':')
+    logging.info(title + ':')
     for threshold, name, diff in zip(*zip(*DIFFERENCE_PARAMETERS), difference):
         log_error_if_differ_much(diff, threshold, name)
 
@@ -67,21 +67,23 @@ def difference(actual, expected, projection, model_vertices):
     return np.array([rotation_diff, translation_diff, points_diff])
 
 
-def compare(model_vertices, projection_matrix, ground_truth, tracking_result):
+def compare(model_vertices, projection_matrix, ground_truth, tracking_result, frames_to_compare=None):
     untracked_frames = []
     average_diff = np.array([0.0, 0.0, 0.0])
     for frame, ground_truth_matrix in ground_truth.items():
         if frame in tracking_result:
             current_diff = difference(tracking_result[frame], ground_truth_matrix, projection_matrix, model_vertices)
             log_errors(current_diff, 'Frame ' + str(frame))
-            average_diff += current_diff
+            if frames_to_compare is None or frame in frames_to_compare:
+                average_diff += current_diff
         else:
             untracked_frames.append(frame)
 
     frames_number = len(ground_truth.items()) - len(untracked_frames)
-    average_diff /= frames_number
+    average_diff /= frames_number if not frames_to_compare else len(frames_to_compare)
     log_errors(average_diff, 'Average diff')
     if untracked_frames:
         logging.error('Untracked frames: ' + str(untracked_frames))
     else:
         logging.info('No untracked frames')
+    return average_diff

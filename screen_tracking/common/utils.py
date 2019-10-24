@@ -21,7 +21,8 @@ class TrackingDataReader:
     @lru_cache(None)
     def get_test_description(self):
         with open(self.relative_file(self.test_description)) as fin:
-            return yaml.load(fin, Loader=yaml.FullLoader)
+            result = yaml.load(fin, Loader=yaml.FullLoader)
+        return result
 
     @lru_cache(None)
     def get_tracking_matrix(self, file):
@@ -32,7 +33,7 @@ class TrackingDataReader:
                 R = np.array(frame['pose']['R'])
                 t = np.array(frame['pose']['t']).reshape((3, 1))
                 result[frame['frame']] = np.hstack((R, t))
-            return result
+        return result
 
     def get_ground_truth(self):
         return self.get_tracking_matrix(self.get_test_description()['ground_truth'])
@@ -65,6 +66,7 @@ class TrackingDataReader:
                 to_write.append(frame_result)
 
             yaml.dump(to_write, fout, default_flow_style=None)
+            fout.close()
 
     def get_screen_points(self, frames, poses):
         result_screen_points = {}

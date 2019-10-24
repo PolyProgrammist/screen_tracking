@@ -1,15 +1,23 @@
+import math
+
 import cv2
 import numpy as np
 
+from screen_tracking.common.common import normalize_angle
 
-class Tracker:
+
+class TrackerParams:
     MARGIN_FRACTION = 1 / 5
     CANNY_THRESHOLD_1 = 50
     CANNY_THRESHOLD_2 = 150
     MIN_LINE_LENGTH = 100
     MAX_LINE_GAP = 30
-    THRESHOLD_HOUGH_LINES_P = 60
+    THRESHOLD_HOUGH_LINES_P = 50
     APERTURE_SIZE = 3
+
+
+class Tracker:
+    tracker_params = TrackerParams()
 
     def __init__(self, model_vertices, camera_params, video_source, frame_pixels):
         self.model_vertices = model_vertices
@@ -23,7 +31,7 @@ class Tracker:
             for j in range(4):
                 cur_length = np.linalg.norm(last_points[i] - last_points[j])
                 length = max(length, cur_length)
-        offset_len = length * self.MARGIN_FRACTION
+        offset_len = length * self.tracker_params.MARGIN_FRACTION
         dxs = [-1, 0, 1, 0]
         dys = [0, 1, 0, -1]
         offsets = [[offset_len * dx, offset_len * dy] for dx, dy in zip(dxs, dys)]
@@ -44,8 +52,8 @@ class Tracker:
         min_x, min_y, max_x, max_y = bbox
         return frame.copy()[min_y:max_y, min_x:max_x, :]
 
-    def adjust_vector(self, vector):
-        return vector / np.linalg.norm(vector)
+    def adjust_vector_abc(self, vector):
+        return vector / np.linalg.norm(vector[:2])
 
     def points_to_abc(self, p1, p2):
         x1, y1 = p1
@@ -55,6 +63,9 @@ class Tracker:
         c = a * x1 + b * y1
         ar = np.array([a, b, c])
         return ar
+
+    def adjusted_abc(self, line):
+        return self.adjust_vector_abc(self.points_to_abc(line[0], line[1]))
 
     def screen_lines_to_points(self, lines):
         intersections = []
@@ -87,25 +98,44 @@ class Tracker:
     def hough_lines(self, cur_frame_init, bbox):
         cur_frame = self.cut(cur_frame_init, bbox)
         gray = cv2.cvtColor(cur_frame, cv2.COLOR_BGR2GRAY)
-        edges = cv2.Canny(gray, self.CANNY_THRESHOLD_1, self.CANNY_THRESHOLD_2, apertureSize=self.APERTURE_SIZE)
-        lines = cv2.HoughLinesP(edges, 1, np.pi / 180, self.THRESHOLD_HOUGH_LINES_P, minLineLength=self.MIN_LINE_LENGTH,
-                                maxLineGap=self.MAX_LINE_GAP)
+        edges = cv2.Canny(gray, self.tracker_params.CANNY_THRESHOLD_1, self.tracker_params.CANNY_THRESHOLD_2,
+                          apertureSize=self.tracker_params.APERTURE_SIZE, L2gradient=True)
+        lines = cv2.HoughLinesP(edges, 1, np.pi / 180, self.tracker_params.THRESHOLD_HOUGH_LINES_P,
+                                minLineLength=self.tracker_params.MIN_LINE_LENGTH,
+                                maxLineGap=self.tracker_params.MAX_LINE_GAP)
         lines = [line[0].astype(float) for line in lines]
         lines = [line + np.array([bbox[0], bbox[1], bbox[0], bbox[1]]) for line in lines]
         lines = [[line[:2], line[2:]] for line in lines]
         return np.array(lines)
 
-    def near_lines(self, a, b):
-        return min(np.linalg.norm(a - b), np.linalg.norm(-a - b))
+    def direction_diff(self, a, b):
+        phi_a = np.arctan2(a[0], a[1])
+        phi_b = np.arctan2(b[0], b[1])
+        return normalize_angle(phi_a - phi_b, round=math.pi)
+
+    def distance_to_origin_diff(self, a, b):
+        return np.abs(np.abs(a[2]) - np.abs(b[2]))
 
     def collinear_predicate(self, line, candidate):
-        line_abc = self.adjust_vector(self.points_to_abc(line[0], line[1]))
-        candidate_abc = self.adjust_vector(self.points_to_abc(candidate[0], candidate[1]))
-        value = self.near_lines(line_abc, candidate_abc)
-        return value
+        return self.direction_diff(self.adjusted_abc(line), self.adjusted_abc(candidate))
 
-    def filter_lines(self, last_lines, candidates, predicate):
-        return np.array(sorted(candidates.tolist(), key=lambda candidate: predicate(last_lines, candidate))[:100])
+    def distance_origin_near_predicate(self, line, candidate):
+        return self.distance_to_origin_diff(self.adjusted_abc(line), self.adjusted_abc(candidate))
+
+    def combine_predicate(self, line, candidate):
+        line = self.adjusted_abc(line)
+        candidate = self.adjusted_abc(candidate)
+        coeff = 400
+        return self.direction_diff(line, candidate) * coeff + self.distance_to_origin_diff(line, candidate)
+
+    def filter_lines(self, last_lines, candidates, predicate, max_diff, max_number=20):
+        indices = list(range(len(candidates)))
+        values = np.array([predicate(last_lines, candidates[index]) for index in indices])
+        indices = sorted(indices, key=lambda x: values[x])
+        a = indices[:max_number]
+        b = np.nonzero(values < max_diff)[0]
+        c = [t for t in a if t in b]
+        return candidates[c]
 
     def get_only_lines(self, line, candidates):
         return candidates[0]
@@ -126,10 +156,16 @@ class Tracker:
         hough_lines = self.hough_lines(cur_frame, self.get_bounding_box(cur_frame, last_points))
         candidates = [hough_lines.copy(), hough_lines.copy(), hough_lines.copy(), hough_lines.copy()]
         result = []
-        for line, candidate in zip(last_lines, candidates):
-            candidate = self.filter_lines(line, candidate, self.collinear_predicate)
+        # candidates[3] = self.filter_lines(last_lines[3], candidates[3], self.collinear_predicate, max_diff=0.3)
+        # result = self.filter_lines(last_lines[3], candidates[3], self.distance_origin_near_predicate, max_diff=100)
+        for _, (line, candidate) in enumerate(zip(last_lines, candidates)):
+            candidate = self.filter_lines(line, candidate, self.distance_origin_near_predicate, max_diff=100)
+            candidate = self.filter_lines(line, candidate, self.collinear_predicate, max_diff=0.1)
+            candidate = self.filter_lines(line, candidate, self.combine_predicate, max_diff=100000, max_number=1000)
             result.append(self.get_only_lines(line, candidate))
         intersections = self.screen_lines_to_points(result)
+        # intersections = []
+        # result = result[1:1]
         # self.show(result, cur_frame, intersections)
 
         return intersections
@@ -164,6 +200,12 @@ class Tracker:
         return tracking_result
 
 
-def track(model_vertices, camera_params, video_source, frame_pixels, write_callback, result_file):
-    result = Tracker(model_vertices, camera_params, video_source, frame_pixels).track()
+def track(model_vertices, camera_params, video_source, frame_pixels, write_callback, result_file, tracker_params=None):
+    tracker = Tracker(model_vertices, camera_params, video_source, frame_pixels)
+
+    if tracker_params is not None:
+        tracker.tracker_params = tracker_params
+
+    result = tracker.track()
     write_callback(result)
+    return result
