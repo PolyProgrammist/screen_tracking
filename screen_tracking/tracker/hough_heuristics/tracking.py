@@ -1,4 +1,5 @@
 import math
+import itertools
 
 import cv2
 import numpy as np
@@ -14,7 +15,7 @@ class TrackerParams:
     MAX_LINE_GAP = 30
     THRESHOLD_HOUGH_LINES_P = 50
     APERTURE_SIZE = 3
-    PNP_FLAG = cv2.SOLVEPNP_IPPE
+    PNP_FLAG = cv2.SOLVEPNP_ITERATIVE
 
 
 class Tracker:
@@ -150,27 +151,38 @@ class Tracker:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def pnp_rmse(self, lines):
-        intersections = self.screen_lines_to_points(lines)
-        _, rotation, translation = cv2.solvePnP(self.model_vertices, intersections, self.camera_params,
-                                                np.array([]))
+    def get_external_matrix(self, points):
+        _, rotation, translation = cv2.solvePnP(self.model_vertices, points, self.camera_params,
+                                                np.array([]), flags=self.tracker_params.PNP_FLAG)
         R_rodrigues = cv2.Rodrigues(rotation)[0]
         external_matrix = np.hstack((R_rodrigues, translation))
+        return external_matrix
+
+    def get_screen_points(self, external_matrix):
         points = screen_points(self.camera_params, external_matrix, self.model_vertices)
+        return points
+
+    def pnp_rmse(self, lines):
+        intersections = self.screen_lines_to_points(lines)
+        external_matrix = self.get_external_matrix(intersections)
+        points = self.get_screen_points(external_matrix)
         return np.linalg.norm(points - intersections)
 
+    def previous_matrix_diff(self, lines):
+        intersectinos = self.screen_lines_to_points(lines)
+
     def best_rectangle(self, candidates):
+        # print(np.array(candidates).shape)
         best_score = -1
         best_lines = []
-        for bottom in candidates[0]:
-            for right in candidates[1]:
-                for top in candidates[2]:
-                    for left in candidates[3]:
-                        current = np.array([bottom, right, top, left])
-                        rmse = self.pnp_rmse(current)
-                        if best_score == -1 or rmse < best_score:
-                            best_score = rmse
-                            best_lines = current
+        rmses = []
+        for current in itertools.product(*candidates):
+            # print(current.shape)
+            rmse = self.pnp_rmse(current)
+            if best_score == -1 or rmse < best_score:
+                best_score = rmse
+                best_lines = current
+        # print(sorted(rmses[:5]))
         return best_lines
 
     def get_points(self, cur_frame, last_frame, last_points):
@@ -187,8 +199,7 @@ class Tracker:
                         :10]
             result.append(candidate)
 
-        resulttmp = result.copy()
-        result = self.best_rectangle(result)
+        result = self.best_rectangle(np.array(result))
 
         intersections = self.screen_lines_to_points(result)
         # intersections = []
@@ -198,7 +209,8 @@ class Tracker:
         return intersections
 
     def write_camera(self, tracking_result, pixels, frame):
-        _, rotation, translation = cv2.solvePnP(self.model_vertices, pixels, self.camera_params, np.array([]))
+        _, rotation, translation = cv2.solvePnP(self.model_vertices, pixels, self.camera_params, np.array([]),
+                                                flags=self.tracker_params.PNP_FLAG)
         R_rodrigues = cv2.Rodrigues(rotation)[0]
         external_matrix = np.hstack((R_rodrigues, translation))
         tracking_result[frame] = external_matrix
