@@ -161,8 +161,9 @@ class Tracker:
         for _, (line, candidate) in enumerate(zip(last_lines, candidates)):
             candidate = self.filter_lines(line, candidate, self.distance_origin_near_predicate, max_diff=30)
             candidate = self.filter_lines(line, candidate, self.collinear_predicate, max_diff=0.1)
-            candidate = self.filter_lines(line, candidate, self.combine_predicate, max_diff=100000, max_number=1000)
+            candidate = self.filter_lines(line, candidate, self.combine_predicate, max_diff=100000, max_number=10000)[:10]
             result.append(self.get_only_lines(line, candidate))
+
         intersections = self.screen_lines_to_points(result)
         # intersections = []
         # result = result[1:1]
