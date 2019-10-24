@@ -3,7 +3,7 @@ import math
 import cv2
 import numpy as np
 
-from screen_tracking.common.common import normalize_angle
+from screen_tracking.common.common import normalize_angle, screen_points
 
 
 class TrackerParams:
@@ -14,6 +14,7 @@ class TrackerParams:
     MAX_LINE_GAP = 30
     THRESHOLD_HOUGH_LINES_P = 50
     APERTURE_SIZE = 3
+    PNP_FLAG = cv2.SOLVEPNP_IPPE
 
 
 class Tracker:
@@ -137,10 +138,8 @@ class Tracker:
         c = [t for t in a if t in b]
         return candidates[c]
 
-    def get_only_lines(self, line, candidates):
-        return candidates[0]
-
     def show(self, lines, frame, points):
+        lines = lines.copy()
         to_show = frame.copy()
         for line in lines:
             line = line.astype(int)
@@ -150,6 +149,29 @@ class Tracker:
         cv2.imshow('frame', to_show)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+    def pnp_rmse(self, lines):
+        intersections = self.screen_lines_to_points(lines)
+        _, rotation, translation = cv2.solvePnP(self.model_vertices, intersections, self.camera_params,
+                                                np.array([]))
+        R_rodrigues = cv2.Rodrigues(rotation)[0]
+        external_matrix = np.hstack((R_rodrigues, translation))
+        points = screen_points(self.camera_params, external_matrix, self.model_vertices)
+        return np.linalg.norm(points - intersections)
+
+    def best_rectangle(self, candidates):
+        best_score = -1
+        best_lines = []
+        for bottom in candidates[0]:
+            for right in candidates[1]:
+                for top in candidates[2]:
+                    for left in candidates[3]:
+                        current = np.array([bottom, right, top, left])
+                        rmse = self.pnp_rmse(current)
+                        if best_score == -1 or rmse < best_score:
+                            best_score = rmse
+                            best_lines = current
+        return best_lines
 
     def get_points(self, cur_frame, last_frame, last_points):
         last_lines = self.screen_points_to_lines(last_points)
@@ -161,8 +183,12 @@ class Tracker:
         for _, (line, candidate) in enumerate(zip(last_lines, candidates)):
             candidate = self.filter_lines(line, candidate, self.distance_origin_near_predicate, max_diff=30)
             candidate = self.filter_lines(line, candidate, self.collinear_predicate, max_diff=0.1)
-            candidate = self.filter_lines(line, candidate, self.combine_predicate, max_diff=100000, max_number=10000)[:10]
-            result.append(self.get_only_lines(line, candidate))
+            candidate = self.filter_lines(line, candidate, self.combine_predicate, max_diff=100000, max_number=10000)[
+                        :10]
+            result.append(candidate)
+
+        resulttmp = result.copy()
+        result = self.best_rectangle(result)
 
         intersections = self.screen_lines_to_points(result)
         # intersections = []
@@ -185,8 +211,10 @@ class Tracker:
         ret, last_frame = cap.read()
         last_frame = [last_frame]
         last_points = [self.frame_pixels[1]]
-        self.write_camera(tracking_result, last_points[0], 1)
+        frame_number = 1
+        self.write_camera(tracking_result, last_points[0], frame_number)
         frame_number = 2
+        # return tracking_result
 
         while cap.isOpened():
             ret, frame = cap.read()
@@ -197,6 +225,9 @@ class Tracker:
             last_points[0] = points
             last_frame[0] = frame
             frame_number += 1
+            print(frame_number)
+            if frame_number == 84:
+                break
 
         return tracking_result
 
