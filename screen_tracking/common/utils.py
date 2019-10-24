@@ -9,11 +9,16 @@ np.set_printoptions(precision=3, suppress=True)
 
 
 class TrackingDataReader:
-    def __init__(self, test_directory, **kwargs):
-        self.test_directory = test_directory
-        self.test_description = kwargs.get('test_description')
-        self.video_output = kwargs.get('video_output')
-        self.tracking_result_output = kwargs.get('tracking_result_output')
+    DEFAULT_TEST = 'resources/tests/generated_tv_on'
+    DEFAULT_DESCRIPTION_FILE = 'test_description.yml'
+    DEFAULT_VIDEO_OUTPUT = 'out.mp4'
+    DEFAULT_TRACKING_OUTPUT = 'tracking_result.yml'
+
+    def __init__(self, **kwargs):
+        self.test_directory = kwargs.get('test_directory', self.DEFAULT_TEST)
+        self.test_description = kwargs.get('test_description', self.DEFAULT_DESCRIPTION_FILE)
+        self.video_output = kwargs.get('video_output', self.DEFAULT_VIDEO_OUTPUT)
+        self.tracking_result_output = kwargs.get('tracking_result_output', self.DEFAULT_TRACKING_OUTPUT)
 
     def relative_file(self, file):
         return os.path.join(self.test_directory, file)
@@ -21,7 +26,8 @@ class TrackingDataReader:
     @lru_cache(None)
     def get_test_description(self):
         with open(self.relative_file(self.test_description)) as fin:
-            return yaml.load(fin, Loader=yaml.FullLoader)
+            result = yaml.load(fin, Loader=yaml.FullLoader)
+        return result
 
     @lru_cache(None)
     def get_tracking_matrix(self, file):
@@ -32,7 +38,7 @@ class TrackingDataReader:
                 R = np.array(frame['pose']['R'])
                 t = np.array(frame['pose']['t']).reshape((3, 1))
                 result[frame['frame']] = np.hstack((R, t))
-            return result
+        return result
 
     def get_ground_truth(self):
         return self.get_tracking_matrix(self.get_test_description()['ground_truth'])
@@ -65,6 +71,7 @@ class TrackingDataReader:
                 to_write.append(frame_result)
 
             yaml.dump(to_write, fout, default_flow_style=None)
+            fout.close()
 
     def get_screen_points(self, frames, poses):
         result_screen_points = {}
@@ -78,8 +85,6 @@ class TrackingDataReader:
 
     def generate_user_input_from_ground_truth(self):
         resulting_points = self.get_screen_points([1, 5, 15, 23], self.get_ground_truth())
-        for frame, points in resulting_points.items():
-            points += np.random.rand(len(points), 2) * 3
         return resulting_points
 
     def compare_input(self):
