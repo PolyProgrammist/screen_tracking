@@ -159,7 +159,7 @@ class Tracker:
         # candidates[3] = self.filter_lines(last_lines[3], candidates[3], self.collinear_predicate, max_diff=0.3)
         # result = self.filter_lines(last_lines[3], candidates[3], self.distance_origin_near_predicate, max_diff=100)
         for _, (line, candidate) in enumerate(zip(last_lines, candidates)):
-            candidate = self.filter_lines(line, candidate, self.distance_origin_near_predicate, max_diff=100)
+            candidate = self.filter_lines(line, candidate, self.distance_origin_near_predicate, max_diff=30)
             candidate = self.filter_lines(line, candidate, self.collinear_predicate, max_diff=0.1)
             candidate = self.filter_lines(line, candidate, self.combine_predicate, max_diff=100000, max_number=1000)
             result.append(self.get_only_lines(line, candidate))
