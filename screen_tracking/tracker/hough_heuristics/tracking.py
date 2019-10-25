@@ -1,3 +1,4 @@
+import logging
 import math
 import itertools
 
@@ -39,16 +40,24 @@ class Tracker:
 
         hough_frontier = HoughFrontier(self)
 
+        print('hough ', len(hough_frontier.top_current()))
         side_frontiers = [hough_frontier for _ in last_lines]
         side_frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
+        print('phi ', [len(side.top_current()) for side in side_frontiers])
+
         side_frontiers = [RoFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
+        print('ro ', [len(side.top_current()) for side in side_frontiers])
 
         rect_frontier = RectFrontier(side_frontiers)
+
+        print('before pnprmse', len(rect_frontier.top_current()))
+
         rect_frontier = PNPrmseFrontier(rect_frontier)
 
         # rect_frontier = GroundTruthFrontier(rect_frontier)
         # rect_frontier.candidates = rect_frontier.top_current(max_count=1)
 
+        print('before previous', len(rect_frontier.top_current()))
         rect_frontier = PreviousPoseFrontier(rect_frontier)
 
         # print(rect_frontier.top_current()[2].current_score_)
@@ -80,6 +89,8 @@ class Tracker:
         frame_number = 2
 
         while cap.isOpened():
+            self.state.frame_number = frame_number
+            # try:
             ret, frame = cap.read()
             if not ret:
                 break
@@ -91,6 +102,9 @@ class Tracker:
             # if frame_number == 2:
             #     break
             frame_number += 1
+            # except:
+            #     logging.error('Tracker broken')
+            #     break
 
         return tracking_result
 
