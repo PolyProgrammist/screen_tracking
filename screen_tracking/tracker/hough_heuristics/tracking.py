@@ -89,20 +89,18 @@ class Tracker:
         intersections = screen_lines_to_points(lines)
         external_matrix = self.get_external_matrix(intersections)
         points = self.get_screen_points(external_matrix)
-        if \
-        external_matrices_difference(external_matrix, self.tracker_params.gt2, self.camera_params, self.model_vertices)[
-            2] < 0.03:
-            print(np.linalg.norm(points - intersections))
-            print('yahoo')
-            cur_points = self.get_screen_points(external_matrix)
-            frame = self.cur_frame.copy()
-            for i, point in enumerate(cur_points):
-                from screen_tracking.test.draw_result import to_screen
-                cv2.circle(frame, to_screen(point), 3, (0, 0, 255), -1)
-                cv2.line(frame, to_screen(cur_points[i]), to_screen(cur_points[(i + 1) % len(cur_points)]), (0, 0, 255))
-            cv2.imshow('best', frame)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
+        # if \
+        # external_matrices_difference(external_matrix, self.tracker_params.gt2, self.camera_params, self.model_vertices)[
+        #     2] < 0.03:
+        #     cur_points = self.get_screen_points(external_matrix)
+        #     frame = self.cur_frame.copy()
+        #     for i, point in enumerate(cur_points):
+        #         from screen_tracking.test.draw_result import to_screen
+        #         cv2.circle(frame, to_screen(point), 3, (0, 0, 255), -1)
+        #         cv2.line(frame, to_screen(cur_points[i]), to_screen(cur_points[(i + 1) % len(cur_points)]), (0, 0, 255))
+        #     cv2.imshow('best', frame)
+        #     cv2.waitKey(0)
+        #     cv2.destroyAllWindows()
 
         return np.linalg.norm(points - intersections)
 
@@ -112,16 +110,13 @@ class Tracker:
         current_external_matrix = self.get_external_matrix(intersections)
         diff = external_matrices_difference(current_external_matrix, previous_external_matrix, self.camera_params,
                                             self.model_vertices)
-        print(diff)
 
     def best_rectangle(self, candidates):
         candidate_rectangles = list(itertools.product(*candidates))
-        print(len(candidate_rectangles))
         rmses = []
         rmses = np.array(list(map(self.pnp_rmse, candidate_rectangles)))
         indices = list(range(len(candidate_rectangles)))
         indices = sorted(indices, key=lambda x: rmses[x])
-        print(rmses[indices[:100]])
         return candidate_rectangles[indices[9]]
 
     def get_points(self, cur_frame, last_frame, last_points):
@@ -174,7 +169,6 @@ class Tracker:
             self.write_camera(tracking_result, points, frame_number)
             last_points[0] = points
             last_frame[0] = frame
-            print(frame_number)
             if frame_number == 2:
                 break
             frame_number += 1

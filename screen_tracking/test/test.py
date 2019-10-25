@@ -31,10 +31,7 @@ def test(steps, algorithm, **kwargs):
         if algorithm == 'example':
             example_tracking.track(*reader.tracker_input())
         if algorithm == 'hough':
-            from screen_tracking.tracker.hough_heuristics.tracking import TrackerParams
-            params = TrackerParams
-            params.gt2 = reader.get_ground_truth()[1]
-            hough_tracking.track(*reader.tracker_input(), tracker_params=params)
+            hough_tracking.track(*reader.tracker_input())
     if 'compare' in steps:
         compare.compare(*reader.compare_input())
     if 'write_video' in steps:
