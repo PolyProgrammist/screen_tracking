@@ -10,3 +10,7 @@ class TrackerParams:
     THRESHOLD_HOUGH_LINES_P = 50
     APERTURE_SIZE = 3
     PNP_FLAG = cv2.SOLVEPNP_ITERATIVE
+
+
+class TrackerState:
+    pass
