@@ -5,8 +5,9 @@ from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
 class RoFrontier(Frontier):
     def __init__(self, frontier, last_frame_line):
         super().__init__()
-        self.tracker_params = frontier.tracker_params
-        self.state = frontier.state
+        self.tracker = frontier.tracker
+        self.tracker_params = self.tracker.tracker_params
+        self.state = self.tracker.state
         self.candidates = [RoCandidate(last_frame_line, candidate, self.tracker_params) for candidate in
                            frontier.top_current()]
 

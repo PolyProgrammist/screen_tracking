@@ -9,8 +9,9 @@ from screen_tracking.tracker.hough_heuristics.utils import cut, get_bounding_box
 class HoughFrontier(Frontier):
     def __init__(self, tracker):
         super().__init__()
-        self.tracker_params = tracker.tracker_params
-        self.state = tracker.state
+        self.tracker = tracker
+        self.tracker_params = self.tracker.tracker_params
+        self.state = self.tracker.state
         hough_lines = self.hough_lines(self.state.cur_frame,
                                        get_bounding_box(self.state.cur_frame, self.state.last_points,
                                                         self.tracker_params.MARGIN_FRACTION))

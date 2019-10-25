@@ -1,5 +1,7 @@
 import cv2
 
+from screen_tracking.tracker.hough_heuristics.utils import screen_lines_to_points, screen_points_to_lines
+
 
 class Frontier:
     def __init__(self):
@@ -33,3 +35,20 @@ def show_lines(frontier, **kwargs):
         cv2.imshow('Phi frontier', cur_frame)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+# def show(candidate):
+#     points = screen_lines_to_points(candidate.line_candidates)
+#     lines = screen_points_to_lines(points)
+#
+#     to_show = candidate.tracker_param
+#     for line in lines:
+#         line = line.astype(int)
+#         cv2.line(to_show, tuple(line[0]), tuple(line[1]), color=(0, 0, 255), thickness=1)
+#     for point in points:
+#         cv2.circle(to_show, tuple(point.astype(int)), 5, color=(0, 255, 0), thickness=-1)
+#     cv2.imshow('frame', to_show)
+#     cv2.waitKey(0)
+#     cv2.destroyAllWindows()
+#
+# def show_rectangle(candidate):
+#     pass
