@@ -1,8 +1,7 @@
-import cv2
 import numpy as np
 
 
-def get_bounding_box(cur_frame, last_points, margin_fraction):
+def get_bounding_box(shape, last_points, margin_fraction):
     length = 0
     for i in range(4):
         for j in range(4):
@@ -14,21 +13,16 @@ def get_bounding_box(cur_frame, last_points, margin_fraction):
     offsets = [[offset_len * dx, offset_len * dy] for dx, dy in zip(dxs, dys)]
     points = [point + offset for offset in offsets for point in last_points]
 
-    min_x = np.clip(min(p[0] for p in points), 0, cur_frame.shape[1])
-    max_x = np.clip(max(p[0] for p in points), 0, cur_frame.shape[1])
-    min_y = np.clip(min(p[1] for p in points), 0, cur_frame.shape[0])
-    max_y = np.clip(max(p[1] for p in points), 0, cur_frame.shape[0])
+    min_x = np.clip(min(p[0] for p in points), 0, shape[1])
+    max_x = np.clip(max(p[0] for p in points), 0, shape[1])
+    min_y = np.clip(min(p[1] for p in points), 0, shape[0])
+    max_y = np.clip(max(p[1] for p in points), 0, shape[0])
 
     result = min_x, min_y, max_x, max_y
 
     result = tuple(map(int, result))
 
     return result
-
-
-def cut(frame, bbox):
-    min_x, min_y, max_x, max_y = bbox
-    return frame.copy()[min_y:max_y, min_x:max_x, :]
 
 
 def adjust_vector_abc(vector):
@@ -78,20 +72,3 @@ def lines_intersection(line1, line2):
     x = det(d, xdiff) / div
     y = det(d, ydiff) / div
     return np.array([x, y])
-
-
-def draw_line(frame, line):
-    cv2.line(frame, tuple(map(int, line[0])), tuple(map(int, line[1])), color=(0, 0, 255), thickness=1)
-
-
-def draw_point(frame, point):
-    cv2.circle(frame, tuple(point.astype(int)), 5, color=(0, 255, 0), thickness=-1)
-
-
-def rectangle_draw(frame, candidate):
-    points = screen_lines_to_points([candidate.line for candidate in candidate.line_candidates])
-    lines = screen_points_to_lines(points)
-    for line in lines:
-        draw_line(frame, line)
-    for point in points:
-        draw_point(frame, point)

@@ -1,6 +1,6 @@
 import cv2
 
-from screen_tracking.tracker.hough_heuristics.utils import screen_lines_to_points, screen_points_to_lines
+from screen_tracking.tracker.hough_heuristics.utils.geom2d import screen_lines_to_points, screen_points_to_lines
 
 
 class Frontier:

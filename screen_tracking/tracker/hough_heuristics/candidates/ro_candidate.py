@@ -1,8 +1,9 @@
 import numpy as np
 
 from screen_tracking.common.common import normalize_angle
-from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate, draw_line
-from screen_tracking.tracker.hough_heuristics.utils import adjusted_abc
+from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
+from screen_tracking.tracker.hough_heuristics.utils.draw import draw_line
+from screen_tracking.tracker.hough_heuristics.utils.geom2d import adjusted_abc
 
 
 class RoCandidate(Candidate):

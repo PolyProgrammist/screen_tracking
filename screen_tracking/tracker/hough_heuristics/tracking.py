@@ -12,8 +12,9 @@ from screen_tracking.tracker.hough_heuristics.frontiers.phi_frontier import PhiF
 from screen_tracking.tracker.hough_heuristics.frontiers.rect_frontier import RectFrontier
 from screen_tracking.tracker.hough_heuristics.frontiers.ro_frontier import RoFrontier
 from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams, TrackerState
-from screen_tracking.tracker.hough_heuristics.utils import adjusted_abc, screen_lines_to_points, screen_points_to_lines, \
-    get_bounding_box, cut
+from screen_tracking.tracker.hough_heuristics.utils.draw import cut
+from screen_tracking.tracker.hough_heuristics.utils.geom2d import get_bounding_box, adjusted_abc, \
+    screen_lines_to_points, screen_points_to_lines
 
 
 class Tracker:
@@ -25,33 +26,6 @@ class Tracker:
         self.video_source = video_source
         self.frame_pixels = frame_pixels
         self.state = TrackerState()
-
-    # def combine_predicate(self, line, candidate):
-    #     line = adjusted_abc(line)
-    #     candidate = adjusted_abc(candidate)
-    #     coeff = 400
-    #     return self.direction_diff(line, candidate) * coeff + self.distance_to_origin_diff(line, candidate)
-
-    def filter_lines(self, last_lines, candidates, predicate, max_diff, max_number=20):
-        indices = list(range(len(candidates)))
-        values = np.array([predicate(last_lines, candidates[index]) for index in indices])
-        indices = sorted(indices, key=lambda x: values[x])
-        a = indices[:max_number]
-        b = np.nonzero(values < max_diff)[0]
-        c = [t for t in a if t in b]
-        return candidates[c]
-
-    def show(self, lines, frame, points):
-        lines = lines.copy()
-        to_show = frame.copy()
-        for line in lines:
-            line = line.astype(int)
-            cv2.line(to_show, tuple(line[0]), tuple(line[1]), color=(0, 0, 255), thickness=1)
-        for point in points:
-            cv2.circle(to_show, tuple(point.astype(int)), 5, color=(0, 255, 0), thickness=-1)
-        cv2.imshow('frame', to_show)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
     def get_external_matrix(self, points):
         _, rotation, translation = cv2.solvePnP(self.model_vertices, points, self.camera_params,
@@ -89,14 +63,6 @@ class Tracker:
         current_external_matrix = self.get_external_matrix(intersections)
         diff = external_matrices_difference(current_external_matrix, previous_external_matrix, self.camera_params,
                                             self.model_vertices)
-
-    def best_rectangle(self, candidates):
-        candidate_rectangles = list(itertools.product(*candidates))
-        rmses = []
-        rmses = np.array(list(map(self.pnp_rmse, candidate_rectangles)))
-        indices = list(range(len(candidate_rectangles)))
-        indices = sorted(indices, key=lambda x: rmses[x])
-        return candidate_rectangles[indices[9]]
 
     def get_points(self, cur_frame, last_frame, last_points):
         self.state.cur_frame = cur_frame

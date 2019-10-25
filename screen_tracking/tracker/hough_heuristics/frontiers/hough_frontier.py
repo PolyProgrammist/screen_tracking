@@ -3,14 +3,15 @@ import numpy as np
 
 from screen_tracking.tracker.hough_heuristics.candidates.hough_candidate import HoughCandidate
 from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier, show_best
-from screen_tracking.tracker.hough_heuristics.utils import cut, get_bounding_box
+from screen_tracking.tracker.hough_heuristics.utils.draw import cut
+from screen_tracking.tracker.hough_heuristics.utils.geom2d import get_bounding_box
 
 
 class HoughFrontier(Frontier):
     def __init__(self, tracker):
         super().__init__(tracker)
         hough_lines = self.hough_lines(self.state.cur_frame,
-                                       get_bounding_box(self.state.cur_frame, self.state.last_points,
+                                       get_bounding_box(self.state.cur_frame.shape, self.state.last_points,
                                                         self.tracker_params.MARGIN_FRACTION))
         self.candidates = [HoughCandidate(line) for line in hough_lines]
 
