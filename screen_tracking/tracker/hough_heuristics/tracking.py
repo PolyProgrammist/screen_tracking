@@ -6,8 +6,10 @@ import numpy as np
 
 from screen_tracking.common.common import normalize_angle, screen_points
 from screen_tracking.test.compare import difference as external_matrices_difference
+from screen_tracking.tracker.hough_heuristics.frontiers.frontier import show_best
 from screen_tracking.tracker.hough_heuristics.frontiers.hough_frontier import HoughFrontier
 from screen_tracking.tracker.hough_heuristics.frontiers.phi_frontier import PhiFrontier
+from screen_tracking.tracker.hough_heuristics.frontiers.rect_frontier import RectFrontier
 from screen_tracking.tracker.hough_heuristics.frontiers.ro_frontier import RoFrontier
 from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams, TrackerState
 from screen_tracking.tracker.hough_heuristics.utils import adjusted_abc, screen_lines_to_points, screen_points_to_lines, \
@@ -105,9 +107,10 @@ class Tracker:
         side_frontiers = [hough_frontier for _ in last_lines]
         side_frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
         side_frontiers = [RoFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
-        side_frontiers[0].show()
-        result = self.best_rectangle(np.array(result))
-        #
+
+        rect_frontier = RectFrontier(side_frontiers)
+        show_best(rect_frontier)
+
         intersections = screen_lines_to_points(result)
         # intersections = []
         # result = result[1:1]

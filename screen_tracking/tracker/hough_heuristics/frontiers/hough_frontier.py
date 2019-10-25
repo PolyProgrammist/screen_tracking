@@ -2,16 +2,13 @@ import cv2
 import numpy as np
 
 from screen_tracking.tracker.hough_heuristics.candidates.hough_candidate import HoughCandidate
-from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
+from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier, show_best
 from screen_tracking.tracker.hough_heuristics.utils import cut, get_bounding_box
 
 
 class HoughFrontier(Frontier):
     def __init__(self, tracker):
-        super().__init__()
-        self.tracker = tracker
-        self.tracker_params = self.tracker.tracker_params
-        self.state = self.tracker.state
+        super().__init__(tracker)
         hough_lines = self.hough_lines(self.state.cur_frame,
                                        get_bounding_box(self.state.cur_frame, self.state.last_points,
                                                         self.tracker_params.MARGIN_FRACTION))
@@ -29,14 +26,3 @@ class HoughFrontier(Frontier):
         lines = [line + np.array([bbox[0], bbox[1], bbox[0], bbox[1]]) for line in lines]
         lines = [[line[:2], line[2:]] for line in lines]
         return np.array(lines)
-
-    def show(self):
-        cur_frame = self.state.cur_frame.copy()
-        for candidate in self.candidates:
-            candidate.draw(cur_frame)
-        cv2.imshow('Hough lines', cur_frame)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-    def max_diff_score(self):
-        return 1

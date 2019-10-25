@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 
 
@@ -77,3 +78,20 @@ def lines_intersection(line1, line2):
     x = det(d, xdiff) / div
     y = det(d, ydiff) / div
     return np.array([x, y])
+
+
+def draw_line(frame, line):
+    cv2.line(frame, tuple(map(int, line[0])), tuple(map(int, line[1])), color=(0, 0, 255), thickness=1)
+
+
+def draw_point(frame, point):
+    cv2.circle(frame, tuple(point.astype(int)), 5, color=(0, 255, 0), thickness=-1)
+
+
+def rectangle_draw(frame, candidate):
+    points = screen_lines_to_points([candidate.line for candidate in candidate.line_candidates])
+    lines = screen_points_to_lines(points)
+    for line in lines:
+        draw_line(frame, line)
+    for point in points:
+        draw_point(frame, point)
