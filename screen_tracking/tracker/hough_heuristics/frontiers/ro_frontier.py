@@ -1,5 +1,6 @@
-from screen_tracking.tracker.hough_heuristics.candidates.ro_candidate import RoCandidate
-from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier, show_best
+from screen_tracking.tracker.hough_heuristics.candidates import RoCandidate
+
+from .frontier import Frontier
 
 
 class RoFrontier(Frontier):

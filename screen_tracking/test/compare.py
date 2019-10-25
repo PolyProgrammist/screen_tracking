@@ -4,7 +4,7 @@ import transforms3d
 import numpy as np
 from scipy.spatial import distance
 
-from screen_tracking.common.common import normalize_angle, screen_points
+from screen_tracking.common import normalize_angle, screen_points
 
 DIFFERENCE_PARAMETERS = [
     (0.04, 'External parameters rotation'),

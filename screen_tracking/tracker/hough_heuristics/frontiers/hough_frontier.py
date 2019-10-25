@@ -1,10 +1,10 @@
 import cv2
 import numpy as np
 
-from screen_tracking.tracker.hough_heuristics.candidates.hough_candidate import HoughCandidate
-from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier, show_best
-from screen_tracking.tracker.hough_heuristics.utils.draw import cut
-from screen_tracking.tracker.hough_heuristics.utils.geom2d import get_bounding_box
+from screen_tracking.tracker.hough_heuristics.candidates import HoughCandidate
+from screen_tracking.tracker.hough_heuristics.utils import cut, get_bounding_box
+
+from .frontier import Frontier
 
 
 class HoughFrontier(Frontier):

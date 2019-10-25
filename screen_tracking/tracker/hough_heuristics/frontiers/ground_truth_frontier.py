@@ -1,8 +1,9 @@
 import logging
 
-from screen_tracking.tracker.hough_heuristics.candidates.ground_truth_candidate import GroundTruthCandidate
-from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
-from screen_tracking.common.utils import TrackingDataReader
+from screen_tracking.common import TrackingDataReader
+from screen_tracking.tracker.hough_heuristics.candidates import GroundTruthCandidate
+
+from .frontier import Frontier
 
 
 class GroundTruthFrontier(Frontier):

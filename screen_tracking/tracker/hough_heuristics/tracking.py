@@ -1,22 +1,23 @@
 import logging
-import math
-import itertools
 
 import cv2
 import numpy as np
 
-from screen_tracking.tracker.hough_heuristics.frontiers.frontier import show_best
-from screen_tracking.tracker.hough_heuristics.frontiers.ground_truth_frontier import GroundTruthFrontier
-from screen_tracking.tracker.hough_heuristics.frontiers.hough_frontier import HoughFrontier
-from screen_tracking.tracker.hough_heuristics.frontiers.phi_frontier import PhiFrontier
-from screen_tracking.tracker.hough_heuristics.frontiers.pnp_rmse_frontier import PNPrmseFrontier
-from screen_tracking.tracker.hough_heuristics.frontiers.previous_pose_frontier import PreviousPoseFrontier
-from screen_tracking.tracker.hough_heuristics.frontiers.rect_frontier import RectFrontier
-from screen_tracking.tracker.hough_heuristics.frontiers.ro_frontier import RoFrontier
 from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams, TrackerState
-from screen_tracking.tracker.hough_heuristics.utils.geom2d import \
-    screen_lines_to_points, screen_points_to_lines
-from screen_tracking.tracker.hough_heuristics.utils.geom3d import predict_next, get_screen_points
+from screen_tracking.tracker.hough_heuristics.frontiers import (
+    show_best,
+    PreviousPoseFrontier,
+    PNPrmseFrontier,
+    RoFrontier,
+    PhiFrontier,
+    HoughFrontier,
+    RectFrontier
+)
+from screen_tracking.tracker.hough_heuristics.utils import (
+    get_screen_points,
+    screen_lines_to_points,
+    screen_points_to_lines
+)
 
 
 class Tracker:

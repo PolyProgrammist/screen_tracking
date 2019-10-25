@@ -1,6 +1,6 @@
 import cv2
 
-from screen_tracking.common.common import screen_points
+from screen_tracking.common import screen_points
 
 
 def to_screen(point):

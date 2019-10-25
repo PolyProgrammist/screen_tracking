@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from screen_tracking.common.common import screen_points
+from screen_tracking.common import screen_points
 from screen_tracking.test.compare import external_difference
 
 

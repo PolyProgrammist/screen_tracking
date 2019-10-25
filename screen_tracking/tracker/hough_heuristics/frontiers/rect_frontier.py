@@ -1,7 +1,8 @@
 import itertools
 
-from screen_tracking.tracker.hough_heuristics.candidates.rect_candidate import RectCandidate
-from screen_tracking.tracker.hough_heuristics.frontiers.frontier import show_best, Frontier
+from screen_tracking.tracker.hough_heuristics.candidates import RectCandidate
+
+from .frontier import Frontier
 
 
 class RectFrontier(Frontier):

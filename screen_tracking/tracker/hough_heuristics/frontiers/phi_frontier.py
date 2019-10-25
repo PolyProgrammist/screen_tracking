@@ -1,7 +1,6 @@
-import cv2
+from screen_tracking.tracker.hough_heuristics.candidates import PhiCandidate
 
-from screen_tracking.tracker.hough_heuristics.candidates.phi_candidate import PhiCandidate
-from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier, show_best
+from .frontier import Frontier
 
 
 class PhiFrontier(Frontier):
