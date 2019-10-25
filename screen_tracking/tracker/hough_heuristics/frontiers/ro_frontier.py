@@ -14,5 +14,4 @@ class RoFrontier(Frontier):
         return self.tracker_params.MAX_DIFF_RO
 
     def show(self, **kwargs):
-        # frame = kwargs.get('frame', self.state.)
         show_lines(self, **kwargs)

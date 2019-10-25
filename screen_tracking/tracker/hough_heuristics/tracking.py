@@ -102,27 +102,10 @@ class Tracker:
         last_lines = screen_points_to_lines(last_points)
 
         hough_frontier = HoughFrontier(self)
-        cands = hough_frontier.candidates
-        frontiers = [hough_frontier for _ in last_lines]
-        frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(frontiers, last_lines)]
-        frontiers = [RoFrontier(frontier, last_line) for frontier, last_line in zip(frontiers, last_lines)]
-        show_frame = cur_frame.copy()
-        frontiers[0].show(max_count=3, no_show=True, frame=cur_frame)
-        frontiers[1].show(max_count=3, no_show=True, frame=cur_frame)
-        frontiers[2].show(max_count=3, no_show=True, frame=cur_frame)
-        frontiers[3].show(max_count=3, no_show=False, frame=cur_frame)
-
-        # hough_frontier.show()
-        hough_lines = np.array([cand.line for cand in cands])
-
-        candidates = [hough_lines, hough_lines, hough_lines, hough_lines]
-        result = []
-        for _, (line, candidate) in enumerate(zip(last_lines, candidates)):
-            candidate = self.filter_lines(line, candidate, self.distance_origin_near_predicate, max_diff=100)
-            candidate = self.filter_lines(line, candidate, self.collinear_predicate, max_diff=0.1)
-            # candidate = self.filter_lines(line, candidate, self.combine_predicate, max_diff=100000, max_number=10000)
-            result.append(candidate)
-
+        side_frontiers = [hough_frontier for _ in last_lines]
+        side_frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
+        side_frontiers = [RoFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
+        side_frontiers[0].show()
         result = self.best_rectangle(np.array(result))
         #
         intersections = screen_lines_to_points(result)

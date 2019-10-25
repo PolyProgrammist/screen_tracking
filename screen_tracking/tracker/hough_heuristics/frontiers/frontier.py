@@ -5,15 +5,11 @@ class Frontier:
     def __init__(self):
         self.candidates = []
 
-    def top_overall(self, count=None):
-        result = list(sorted(self.candidates, key=lambda candidate: candidate.overall_score_))
-        return result if count is None else result[:count]
-
     def top_current(self, **kwargs):
-        result = list(sorted(self.candidates, key=lambda candidate: candidate.current_score_))
-        if kwargs.get('all_candidates'):
-            return result
-        result = [t for t in result if t.current_score_ <= self.max_diff_score()]
+        comparator = (lambda candidate: candidate.overall_score_) if kwargs.get('overall_score') else (lambda candidate: candidate.current_score_)
+        result = list(sorted(self.candidates, key=comparator))
+        if not kwargs.get('any_value'):
+            result = [t for t in result if t.current_score_ <= self.max_diff_score()]
         return result[:kwargs['max_count']] if 'max_count' in kwargs else result
 
     def overall_current(self):
