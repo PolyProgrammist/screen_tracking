@@ -1,4 +1,4 @@
-from screen_tracking.test.compare import difference as external_matrices_difference
+from screen_tracking.test.compare import external_difference as external_matrices_difference
 from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
 from screen_tracking.tracker.hough_heuristics.utils.draw import rectangle_draw
 from screen_tracking.tracker.hough_heuristics.utils.geom2d import screen_lines_to_points

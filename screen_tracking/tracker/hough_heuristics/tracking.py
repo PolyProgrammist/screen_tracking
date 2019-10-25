@@ -4,17 +4,16 @@ import itertools
 import cv2
 import numpy as np
 
-from screen_tracking.common.common import normalize_angle, screen_points
 from screen_tracking.tracker.hough_heuristics.frontiers.frontier import show_best
 from screen_tracking.tracker.hough_heuristics.frontiers.ground_truth_frontier import GroundTruthFrontier
 from screen_tracking.tracker.hough_heuristics.frontiers.hough_frontier import HoughFrontier
 from screen_tracking.tracker.hough_heuristics.frontiers.phi_frontier import PhiFrontier
 from screen_tracking.tracker.hough_heuristics.frontiers.pnp_rmse_frontier import PNPrmseFrontier
+from screen_tracking.tracker.hough_heuristics.frontiers.previous_pose_frontier import PreviousPoseFrontier
 from screen_tracking.tracker.hough_heuristics.frontiers.rect_frontier import RectFrontier
 from screen_tracking.tracker.hough_heuristics.frontiers.ro_frontier import RoFrontier
 from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams, TrackerState
-from screen_tracking.tracker.hough_heuristics.utils.draw import cut
-from screen_tracking.tracker.hough_heuristics.utils.geom2d import get_bounding_box, adjusted_abc, \
+from screen_tracking.tracker.hough_heuristics.utils.geom2d import \
     screen_lines_to_points, screen_points_to_lines
 
 
@@ -28,13 +27,6 @@ class Tracker:
         self.frame_pixels = frame_pixels
         self.state = TrackerState()
 
-    def previous_matrix_diff(self, lines, last_points):
-        intersections = screen_lines_to_points(lines)
-        previous_external_matrix = get_external_matrix(self.tracker, last_points)
-        current_external_matrix = self.get_external_matrix(self.tracker, intersections)
-        diff = external_matrices_difference(current_external_matrix, previous_external_matrix, self.camera_params,
-                                            self.model_vertices)
-
     def show_list_best(self, side_frontiers):
         frame = self.state.cur_frame.copy()
         for i in range(4):
@@ -46,29 +38,33 @@ class Tracker:
         last_lines = screen_points_to_lines(last_points)
 
         hough_frontier = HoughFrontier(self)
+
         side_frontiers = [hough_frontier for _ in last_lines]
         side_frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
         side_frontiers = [RoFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
 
         rect_frontier = RectFrontier(side_frontiers)
-        print(len(rect_frontier.top_current()))
         rect_frontier = PNPrmseFrontier(rect_frontier)
-        print(len(rect_frontier.top_current()))
 
-        rect_frontier = GroundTruthFrontier(rect_frontier)
-        rect_frontier.candidates = rect_frontier.top_current(max_count=1)
+        # rect_frontier = GroundTruthFrontier(rect_frontier)
+        # rect_frontier.candidates = rect_frontier.top_current(max_count=1)
 
-        print(rect_frontier.top_current()[0].current_score_)
+        rect_frontier = PreviousPoseFrontier(rect_frontier)
 
-        intersections = screen_lines_to_points(result)
+        # print(rect_frontier.top_current()[2].current_score_)
 
-        return []
+        resulting_rect = rect_frontier.top_current()[0]
+        lines = [candidate.line for candidate in resulting_rect.lines]
+        intersections = screen_lines_to_points(lines)
+
+        return intersections
 
     def write_camera(self, tracking_result, pixels, frame):
         _, rotation, translation = cv2.solvePnP(self.model_vertices, pixels, self.camera_params, np.array([]),
                                                 flags=self.tracker_params.PNP_FLAG)
         R_rodrigues = cv2.Rodrigues(rotation)[0]
         external_matrix = np.hstack((R_rodrigues, translation))
+        self.last_matrix = external_matrix
         tracking_result[frame] = external_matrix
 
     def track(self):
@@ -91,8 +87,9 @@ class Tracker:
             self.write_camera(tracking_result, points, frame_number)
             last_points[0] = points
             last_frame[0] = frame
-            if frame_number == 2:
-                break
+            print(frame_number)
+            # if frame_number == 2:
+            #     break
             frame_number += 1
 
         return tracking_result

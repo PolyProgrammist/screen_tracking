@@ -53,7 +53,7 @@ def rotation_translation_points(extrinsic, projection, vertices):
     return rotation, translation, points
 
 
-def difference(actual, expected, projection, model_vertices):
+def external_difference(actual, expected, projection, model_vertices):
     norm_coefficient = np.linalg.norm(model_vertices[0] - model_vertices[2])  # screen diagonal
     actual_rotation, actual_translation, actual_points = \
         rotation_translation_points(actual, projection, model_vertices)
@@ -72,7 +72,7 @@ def compare(model_vertices, projection_matrix, ground_truth, tracking_result, fr
     average_diff = np.array([0.0, 0.0, 0.0])
     for frame, ground_truth_matrix in ground_truth.items():
         if frame in tracking_result:
-            current_diff = difference(tracking_result[frame], ground_truth_matrix, projection_matrix, model_vertices)
+            current_diff = external_difference(tracking_result[frame], ground_truth_matrix, projection_matrix, model_vertices)
             log_errors(current_diff, 'Frame ' + str(frame))
             if frames_to_compare is None or frame in frames_to_compare:
                 average_diff += current_diff
