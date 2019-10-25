@@ -34,9 +34,10 @@ class Tracker:
         for i in range(4):
             show_best(side_frontiers[i], frame=frame, no_show=i < 3)
 
-    def get_points(self, cur_frame, last_frame, last_points):
+    def get_points(self, cur_frame, last_frame, last_points, predict_matrix):
         self.state.cur_frame = cur_frame
         self.state.last_points = last_points
+        self.state.predict_matrix = predict_matrix
         last_lines = screen_points_to_lines(last_points)
 
         hough_frontier = HoughFrontier(self)
@@ -65,7 +66,6 @@ class Tracker:
         )
         R_rodrigues = cv2.Rodrigues(rotation)[0]
         external_matrix = np.hstack((R_rodrigues, translation))
-        self.last_matrix = external_matrix
         tracking_result[frame] = external_matrix
 
     def track(self):
@@ -78,6 +78,7 @@ class Tracker:
         last_points = [self.frame_pixels[1]]
         frame_number = 1
         self.write_camera(tracking_result, last_points[0], frame_number)
+        predict_matrix = tracking_result[frame_number]
         frame_number = 2
 
         while cap.isOpened():
@@ -85,10 +86,10 @@ class Tracker:
                 ret, frame = cap.read()
                 if not ret:
                     break
-                points = self.get_points(frame, last_frame[0], last_points[0])
+                points = self.get_points(frame, last_frame[0], last_points[0], predict_matrix)
                 self.write_camera(tracking_result, points, frame_number)
 
-                predict_matrix = predict_next(tracking_result[frame_number - 1], tracking_result[frame_number - 1])
+                predict_matrix = tracking_result[frame_number]
                 predicted_points = get_screen_points(self, predict_matrix)
                 last_points[0] = predicted_points
                 last_frame[0] = frame

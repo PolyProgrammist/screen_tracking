@@ -3,7 +3,7 @@ import numpy as np
 from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
 from screen_tracking.tracker.hough_heuristics.utils.draw import rectangle_draw
 from screen_tracking.tracker.hough_heuristics.utils.geom2d import screen_lines_to_points
-from screen_tracking.tracker.hough_heuristics.utils.geom3d import get_external_matrix, external_matrices_difference
+from screen_tracking.tracker.hough_heuristics.utils.geom3d import get_external_matrix, difference_with_predicted
 
 
 class PreviousPoseCandidate(Candidate):
@@ -15,7 +15,7 @@ class PreviousPoseCandidate(Candidate):
 
     def previous_matrix_diff(self, lines):
         intersections = screen_lines_to_points(lines)
-        diff = external_matrices_difference(self.tracker, intersections)
+        diff = difference_with_predicted(self.tracker, intersections)
         return diff[0] + diff[1]
 
     def draw(self, frame):
