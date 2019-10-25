@@ -6,6 +6,9 @@ class RectCandidate(Candidate):
     def __init__(self, lines):
         super().__init__()
         self.lines = lines
+        self.scores = {
+            'lines': [line.scores for line in lines]
+        }
 
     def draw(self, frame):
         rectangle_draw(frame, self)

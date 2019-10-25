@@ -12,6 +12,8 @@ class PhiCandidate(Candidate):
         self.line = candidate.line
         self.current_score_ = self.collinear_predicate(last_frame_line, self.line)
         self.overall_score_ = self.current_score_
+        self.scores = {}
+        self.scores['phi'] = self.current_score_
 
     def direction_diff(self, a, b):
         phi_a = np.arctan2(a[0], a[1])

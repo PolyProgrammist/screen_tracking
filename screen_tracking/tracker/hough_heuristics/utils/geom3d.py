@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import transforms3d
 
 from screen_tracking.common.common import screen_points
 from screen_tracking.test.compare import external_difference
@@ -25,3 +26,14 @@ def external_matrices_difference(tracker, points):
         tracker.camera_params,
         tracker.model_vertices
     )
+
+
+def predict_next(previous, current):
+    prev_rotation = previous[:3, :3]
+    prev_translation = previous[:, 3:4]
+    cur_rotation = current[:3, :3]
+    cur_translation = current[:, 3:4]
+    rotation_predict = np.dot(cur_rotation, np.dot(cur_rotation, np.linalg.inv(prev_rotation)))
+    translation_predict = cur_translation + cur_translation - prev_translation
+    predicted = np.hstack((rotation_predict, translation_predict))
+    return predicted

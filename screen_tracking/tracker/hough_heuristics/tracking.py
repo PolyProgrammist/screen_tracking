@@ -16,6 +16,7 @@ from screen_tracking.tracker.hough_heuristics.frontiers.ro_frontier import RoFro
 from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams, TrackerState
 from screen_tracking.tracker.hough_heuristics.utils.geom2d import \
     screen_lines_to_points, screen_points_to_lines
+from screen_tracking.tracker.hough_heuristics.utils.geom3d import predict_next, get_screen_points
 
 
 class Tracker:
@@ -39,29 +40,57 @@ class Tracker:
         last_lines = screen_points_to_lines(last_points)
 
         hough_frontier = HoughFrontier(self)
-
-        print('hough ', len(hough_frontier.top_current()))
+        # print('hough ', len(hough_frontier.top_current()))
         side_frontiers = [hough_frontier for _ in last_lines]
         side_frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
-        print('phi ', [len(side.top_current()) for side in side_frontiers])
+        # print('phi ', [len(side.top_current()) for side in side_frontiers])
+        # phi_scores = np.array([candidate.current_score_ for candidate in side_frontiers[0].top_current()])
 
         side_frontiers = [RoFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
-        print('ro ', [len(side.top_current()) for side in side_frontiers])
+
+        if self.state.frame_number == 3:
+            show_best(side_frontiers[3])
+        # print('ro ', [len(side.top_current()) for side in side_frontiers])
+        # ro_scores = np.array([candidate.current_score_ for candidate in side_frontiers[0].top_current()])
+
+        # ln = min(len(ro_scores), len(phi_scores))
+        # diff_scores = (ro_scores[:ln] / phi_scores[:ln]).mean()
+        # print(ro_scores )
+        # print(phi_scores)
+        # print('average diff', diff_scores)
 
         rect_frontier = RectFrontier(side_frontiers)
 
-        print('before pnprmse', len(rect_frontier.top_current()))
-
-        rect_frontier = PNPrmseFrontier(rect_frontier)
+        # print('before pnprmse', len(rect_frontier.top_current()))
 
         # rect_frontier = GroundTruthFrontier(rect_frontier)
         # rect_frontier.candidates = rect_frontier.top_current(max_count=1)
+        rect_frontier = PNPrmseFrontier(rect_frontier)
+        if self.state.frame_number == 3:
+            show_best(rect_frontier)
 
-        print('before previous', len(rect_frontier.top_current()))
+        # b = {'lines': [
+        #     {'phi': 0.012413998605904641, 'ro': 7.986038901179029},
+        #     {'phi': 0.008950050904575235, 'ro': 0.9928337855714062},
+        #     {'phi': 0.0029629066700249673, 'ro': 3.7704390801020793},
+        #     {'phi': 0.0015595882971870534, 'ro': 0.14911804754268587}],
+        #     'ground_truth': 0.034702612471380644, 'pnprmse': 1.8612209999792495, 'previous_pose': 0.04412731425847862}
+        #
+        # a = {'lines': [
+        #     {'phi': 0.012413998605904641, 'ro': 7.986038901179029},
+        #     {'phi': 0.003927907745674197, 'ro': 4.753696102474578},
+        #     {'phi': 0.0029629066700249673, 'ro': 3.7704390801020793},
+        #     {'phi': 0.010437384051952048, 'ro': 1.509483078328742}],
+        #     'pnprmse': 1.9281745813911357, 'previous_pose': 0.03665580457104706}
+
+        # print('before previous', len(rect_frontier.top_current()))
         rect_frontier = PreviousPoseFrontier(rect_frontier)
+
+        # print([candidate.scores for candidate in rect_frontier.top_current()][0])
 
         # print(rect_frontier.top_current()[2].current_score_)
 
+        print(len(rect_frontier.top_current()))
         resulting_rect = rect_frontier.top_current()[0]
         lines = [candidate.line for candidate in resulting_rect.lines]
         intersections = screen_lines_to_points(lines)
@@ -89,22 +118,25 @@ class Tracker:
         frame_number = 2
 
         while cap.isOpened():
-            self.state.frame_number = frame_number
             # try:
+            self.state.frame_number = frame_number
             ret, frame = cap.read()
             if not ret:
                 break
             points = self.get_points(frame, last_frame[0], last_points[0])
             self.write_camera(tracking_result, points, frame_number)
-            last_points[0] = points
+            predict_matrix = predict_next(tracking_result[frame_number - 1], tracking_result[frame_number - 1])
+            # print(predict_matrix)
+            predicted_points = get_screen_points(self, predict_matrix)
+            last_points[0] = predicted_points
             last_frame[0] = frame
             print(frame_number)
             # if frame_number == 2:
             #     break
             frame_number += 1
-            # except:
-            #     logging.error('Tracker broken')
-            #     break
+        # except:
+        #     logging.error('Tracker broken')
+        #     break
 
         return tracking_result
 

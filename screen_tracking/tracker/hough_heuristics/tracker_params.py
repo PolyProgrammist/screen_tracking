@@ -15,7 +15,7 @@ class TrackerParams:
     MAX_DIFF_RO = 60
     MAX_DIFF_PNP = 5
     MAX_DIFF_PREVIOUS_POSE = 0.5
-    PHI_SCORE_COEFF = 400
+    PHI_SCORE_COEFF = 3000
 
 
 class TrackerState:

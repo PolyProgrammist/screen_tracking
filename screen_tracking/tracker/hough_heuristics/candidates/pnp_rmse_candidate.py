@@ -12,6 +12,8 @@ class PNPrmseCandidate(Candidate):
         self.lines = candidate.lines
         self.tracker = tracker
         self.current_score_ = self.pnp_rmse([line.line for line in self.lines])
+        self.scores = candidate.scores
+        self.scores['pnprmse'] = self.current_score_
 
     def pnp_rmse(self, lines):
         intersections = screen_lines_to_points(lines)

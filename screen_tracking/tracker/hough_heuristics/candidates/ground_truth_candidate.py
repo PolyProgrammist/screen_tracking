@@ -12,6 +12,8 @@ class GroundTruthCandidate(Candidate):
         self.tracker = tracker
         self.ground_truth_matrix = ground_truth_matrix
         self.current_score_ = self.ground_truth_difference([line.line for line in self.lines])
+        self.scores = candidate.scores
+        self.scores['ground_truth'] = self.current_score_
 
     def ground_truth_difference(self, lines):
         intersections = screen_lines_to_points(lines)
