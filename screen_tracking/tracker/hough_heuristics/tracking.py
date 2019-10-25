@@ -16,6 +16,7 @@ from screen_tracking.tracker.hough_heuristics.frontiers.ro_frontier import RoFro
 from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams, TrackerState
 from screen_tracking.tracker.hough_heuristics.utils.geom2d import \
     screen_lines_to_points, screen_points_to_lines
+from screen_tracking.tracker.hough_heuristics.utils.geom3d import predict_next, get_screen_points
 
 
 class Tracker:
@@ -96,7 +97,10 @@ class Tracker:
                 break
             points = self.get_points(frame, last_frame[0], last_points[0])
             self.write_camera(tracking_result, points, frame_number)
-            last_points[0] = points
+
+            predict_matrix = predict_next(tracking_result[frame_number - 1], tracking_result[frame_number - 1])
+            predicted_points = get_screen_points(self, predict_matrix)
+            last_points[0] = predicted_points
             last_frame[0] = frame
             print(frame_number)
             # if frame_number == 2:
