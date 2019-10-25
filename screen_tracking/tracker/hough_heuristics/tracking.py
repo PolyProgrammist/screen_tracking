@@ -6,6 +6,7 @@ import numpy as np
 
 from screen_tracking.common.common import normalize_angle, screen_points
 from screen_tracking.tracker.hough_heuristics.frontiers.frontier import show_best
+from screen_tracking.tracker.hough_heuristics.frontiers.ground_truth_frontier import GroundTruthFrontier
 from screen_tracking.tracker.hough_heuristics.frontiers.hough_frontier import HoughFrontier
 from screen_tracking.tracker.hough_heuristics.frontiers.phi_frontier import PhiFrontier
 from screen_tracking.tracker.hough_heuristics.frontiers.pnp_rmse_frontier import PNPrmseFrontier
@@ -34,6 +35,11 @@ class Tracker:
         diff = external_matrices_difference(current_external_matrix, previous_external_matrix, self.camera_params,
                                             self.model_vertices)
 
+    def show_list_best(self, side_frontiers):
+        frame = self.state.cur_frame.copy()
+        for i in range(4):
+            show_best(side_frontiers[i], frame=frame, no_show=i < 3)
+
     def get_points(self, cur_frame, last_frame, last_points):
         self.state.cur_frame = cur_frame
         self.state.last_points = last_points
@@ -41,16 +47,18 @@ class Tracker:
 
         hough_frontier = HoughFrontier(self)
         side_frontiers = [hough_frontier for _ in last_lines]
-        print([len(side.candidates) for side in side_frontiers])
-        side_frontiers = [PhiFrontier(frontier, last_line, max_count=3) for frontier, last_line in
-                          zip(side_frontiers, last_lines)]
-        print([len(side.candidates) for side in side_frontiers])
-        show_best(side_frontiers[3])
-        exit()
+        side_frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
         side_frontiers = [RoFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
+
         rect_frontier = RectFrontier(side_frontiers)
+        print(len(rect_frontier.top_current()))
         rect_frontier = PNPrmseFrontier(rect_frontier)
-        show_best(rect_frontier, starting_point=0)
+        print(len(rect_frontier.top_current()))
+
+        rect_frontier = GroundTruthFrontier(rect_frontier)
+        rect_frontier.candidates = rect_frontier.top_current(max_count=1)
+
+        print(rect_frontier.top_current()[0].current_score_)
 
         intersections = screen_lines_to_points(result)
 

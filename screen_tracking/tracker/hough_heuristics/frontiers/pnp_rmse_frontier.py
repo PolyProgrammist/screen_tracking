@@ -10,4 +10,4 @@ class PNPrmseFrontier(Frontier):
         self.candidates = [PNPrmseCandidate(candidate, frontier.tracker) for candidate in top]
 
     def max_diff_score(self):
-        return 5
+        return self.tracker_params.MAX_DIFF_PNP
