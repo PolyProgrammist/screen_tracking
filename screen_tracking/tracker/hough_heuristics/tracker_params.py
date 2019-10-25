@@ -11,6 +11,11 @@ class TrackerParams:
     APERTURE_SIZE = 3
     PNP_FLAG = cv2.SOLVEPNP_ITERATIVE
 
+    MAX_NUMBER_LINES_PHI_RO = 20
+    MAX_DIFF_PHI = 0.1
+    MAX_DIFF_RO = 100
+    PHI_SCORE_COEFF = 400
+
 
 class TrackerState:
     pass

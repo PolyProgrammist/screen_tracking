@@ -1,6 +1,6 @@
 import cv2
 
-from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
+from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate, draw_line
 
 
 class HoughCandidate(Candidate):
@@ -9,4 +9,4 @@ class HoughCandidate(Candidate):
         self.line = line
 
     def draw(self, frame):
-        cv2.line(frame, tuple(map(int, self.line[0])), tuple(map(int, self.line[1])), color=(0, 0, 255), thickness=1)
+        draw_line(frame, self.line)

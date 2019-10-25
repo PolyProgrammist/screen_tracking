@@ -7,6 +7,8 @@ import numpy as np
 from screen_tracking.common.common import normalize_angle, screen_points
 from screen_tracking.test.compare import difference as external_matrices_difference
 from screen_tracking.tracker.hough_heuristics.frontiers.hough_frontier import HoughFrontier
+from screen_tracking.tracker.hough_heuristics.frontiers.phi_frontier import PhiFrontier
+from screen_tracking.tracker.hough_heuristics.frontiers.ro_frontier import RoFrontier
 from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams, TrackerState
 from screen_tracking.tracker.hough_heuristics.utils import adjusted_abc, screen_lines_to_points, screen_points_to_lines, \
     get_bounding_box, cut
@@ -22,25 +24,11 @@ class Tracker:
         self.frame_pixels = frame_pixels
         self.state = TrackerState()
 
-    def direction_diff(self, a, b):
-        phi_a = np.arctan2(a[0], a[1])
-        phi_b = np.arctan2(b[0], b[1])
-        return normalize_angle(phi_a - phi_b, round=math.pi)
-
-    def distance_to_origin_diff(self, a, b):
-        return np.abs(np.abs(a[2]) - np.abs(b[2]))
-
-    def collinear_predicate(self, line, candidate):
-        return self.direction_diff(adjusted_abc(line), adjusted_abc(candidate))
-
-    def distance_origin_near_predicate(self, line, candidate):
-        return self.distance_to_origin_diff(adjusted_abc(line), adjusted_abc(candidate))
-
-    def combine_predicate(self, line, candidate):
-        line = adjusted_abc(line)
-        candidate = adjusted_abc(candidate)
-        coeff = 400
-        return self.direction_diff(line, candidate) * coeff + self.distance_to_origin_diff(line, candidate)
+    # def combine_predicate(self, line, candidate):
+    #     line = adjusted_abc(line)
+    #     candidate = adjusted_abc(candidate)
+    #     coeff = 400
+    #     return self.direction_diff(line, candidate) * coeff + self.distance_to_origin_diff(line, candidate)
 
     def filter_lines(self, last_lines, candidates, predicate, max_diff, max_number=20):
         indices = list(range(len(candidates)))
@@ -115,6 +103,9 @@ class Tracker:
 
         hough_frontier = HoughFrontier(self)
         cands = hough_frontier.candidates
+        frontiers = [PhiFrontier(hough_frontier, last_line) for last_line in last_lines]
+        frontiers = [RoFrontier(phi_frontier, last_line) for phi_frontier, last_line in zip(frontiers, last_lines)]
+        frontiers[0].show(True)
 
         # hough_frontier.show()
         hough_lines = np.array([cand.line for cand in cands])
@@ -124,7 +115,7 @@ class Tracker:
         for _, (line, candidate) in enumerate(zip(last_lines, candidates)):
             candidate = self.filter_lines(line, candidate, self.distance_origin_near_predicate, max_diff=100)
             candidate = self.filter_lines(line, candidate, self.collinear_predicate, max_diff=0.1)
-            candidate = self.filter_lines(line, candidate, self.combine_predicate, max_diff=100000, max_number=10000)
+            # candidate = self.filter_lines(line, candidate, self.combine_predicate, max_diff=100000, max_number=10000)
             result.append(candidate)
 
         result = self.best_rectangle(np.array(result))

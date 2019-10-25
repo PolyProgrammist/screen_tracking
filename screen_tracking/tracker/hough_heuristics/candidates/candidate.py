@@ -1,3 +1,6 @@
+import cv2
+
+
 class Candidate:
     def __init__(self):
         self.overall_score_ = 0
@@ -11,3 +14,7 @@ class Candidate:
 
     def draw(self, frame):
         pass
+
+
+def draw_line(frame, line):
+    cv2.line(frame, tuple(map(int, line[0])), tuple(map(int, line[1])), color=(0, 0, 255), thickness=1)

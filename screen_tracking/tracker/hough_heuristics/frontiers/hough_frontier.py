@@ -6,7 +6,7 @@ from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
 from screen_tracking.tracker.hough_heuristics.utils import cut, get_bounding_box
 
 
-class HoughFrontier (Frontier):
+class HoughFrontier(Frontier):
     def __init__(self, tracker):
         super().__init__()
         self.tracker_params = tracker.tracker_params
@@ -36,3 +36,6 @@ class HoughFrontier (Frontier):
         cv2.imshow('Hough lines', cur_frame)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+    def max_diff_score(self):
+        return 1
