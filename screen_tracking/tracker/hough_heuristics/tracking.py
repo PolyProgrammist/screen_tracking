@@ -103,9 +103,14 @@ class Tracker:
 
         hough_frontier = HoughFrontier(self)
         cands = hough_frontier.candidates
-        frontiers = [PhiFrontier(hough_frontier, last_line) for last_line in last_lines]
-        frontiers = [RoFrontier(phi_frontier, last_line) for phi_frontier, last_line in zip(frontiers, last_lines)]
-        frontiers[0].show(True)
+        frontiers = [hough_frontier for _ in last_lines]
+        frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(frontiers, last_lines)]
+        frontiers = [RoFrontier(frontier, last_line) for frontier, last_line in zip(frontiers, last_lines)]
+        show_frame = cur_frame.copy()
+        frontiers[0].show(max_count=3, no_show=True, frame=cur_frame)
+        frontiers[1].show(max_count=3, no_show=True, frame=cur_frame)
+        frontiers[2].show(max_count=3, no_show=True, frame=cur_frame)
+        frontiers[3].show(max_count=3, no_show=False, frame=cur_frame)
 
         # hough_frontier.show()
         hough_lines = np.array([cand.line for cand in cands])

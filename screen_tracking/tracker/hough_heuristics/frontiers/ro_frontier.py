@@ -3,15 +3,16 @@ from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
 
 
 class RoFrontier(Frontier):
-    def __init__(self, phi_frontier, last_frame_line):
+    def __init__(self, frontier, last_frame_line):
         super().__init__()
-        self.tracker_params = phi_frontier.tracker_params
-        self.state = phi_frontier.state
+        self.tracker_params = frontier.tracker_params
+        self.state = frontier.state
         self.candidates = [RoCandidate(last_frame_line, candidate, self.tracker_params) for candidate in
-                           phi_frontier.candidates]
+                           frontier.top_current()]
 
     def max_diff_score(self):
         return self.tracker_params.MAX_DIFF_RO
 
-    def show(self, need_to_show=False):
-        show_lines(self.state.cur_frame.copy(), self.top_current(), need_to_show)
+    def show(self, **kwargs):
+        # frame = kwargs.get('frame', self.state.)
+        show_lines(self, **kwargs)
