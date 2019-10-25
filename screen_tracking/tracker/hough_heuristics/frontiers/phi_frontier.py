@@ -5,9 +5,9 @@ from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
 
 
 class PhiFrontier(Frontier):
-    def __init__(self, frontier, last_frame_line):
+    def __init__(self, frontier, last_frame_line, **top):
         super().__init__(frontier.tracker)
-        self.candidates = [PhiCandidate(last_frame_line, candidate) for candidate in frontier.top_current()]
+        self.candidates = [PhiCandidate(last_frame_line, candidate) for candidate in frontier.top_current(**top)]
 
     def max_diff_score(self):
         return self.tracker_params.MAX_DIFF_PHI

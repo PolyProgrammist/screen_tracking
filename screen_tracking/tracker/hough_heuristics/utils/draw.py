@@ -17,7 +17,7 @@ def draw_point(frame, point):
 
 
 def rectangle_draw(frame, candidate):
-    points = screen_lines_to_points([candidate.line for candidate in candidate.line_candidates])
+    points = screen_lines_to_points([candidate.line for candidate in candidate.lines])
     lines = screen_points_to_lines(points)
     for line in lines:
         draw_line(frame, line)

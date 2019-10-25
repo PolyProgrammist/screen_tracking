@@ -7,9 +7,9 @@ from screen_tracking.tracker.hough_heuristics.utils.geom2d import adjusted_abc
 
 
 class PhiCandidate(Candidate):
-    def __init__(self, last_frame_line, hough_candidate):
+    def __init__(self, last_frame_line, candidate):
         super().__init__()
-        self.line = hough_candidate.line
+        self.line = candidate.line
         self.current_score_ = self.collinear_predicate(last_frame_line, self.line)
         self.overall_score_ = self.current_score_
 
