@@ -9,8 +9,8 @@ from screen_tracking.tracker.hough_heuristics.utils.geom3d import get_external_m
 class PNPrmseCandidate(Candidate):
     def __init__(self, candidate, tracker):
         super().__init__()
-        self.lines = candidate.lines
         self.tracker = tracker
+        self.lines = candidate.lines
         self.current_score_ = self.pnp_rmse([line.line for line in self.lines])
 
     def pnp_rmse(self, lines):

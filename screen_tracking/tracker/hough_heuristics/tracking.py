@@ -41,27 +41,13 @@ class Tracker:
 
         hough_frontier = HoughFrontier(self)
 
-        print('hough ', len(hough_frontier.top_current()))
         side_frontiers = [hough_frontier for _ in last_lines]
         side_frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
-        print('phi ', [len(side.top_current()) for side in side_frontiers])
-
         side_frontiers = [RoFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
-        print('ro ', [len(side.top_current()) for side in side_frontiers])
 
         rect_frontier = RectFrontier(side_frontiers)
-
-        print('before pnprmse', len(rect_frontier.top_current()))
-
         rect_frontier = PNPrmseFrontier(rect_frontier)
-
-        # rect_frontier = GroundTruthFrontier(rect_frontier)
-        # rect_frontier.candidates = rect_frontier.top_current(max_count=1)
-
-        print('before previous', len(rect_frontier.top_current()))
         rect_frontier = PreviousPoseFrontier(rect_frontier)
-
-        # print(rect_frontier.top_current()[2].current_score_)
 
         resulting_rect = rect_frontier.top_current()[0]
         lines = [candidate.line for candidate in resulting_rect.lines]
@@ -70,8 +56,13 @@ class Tracker:
         return intersections
 
     def write_camera(self, tracking_result, pixels, frame):
-        _, rotation, translation = cv2.solvePnP(self.model_vertices, pixels, self.camera_params, np.array([]),
-                                                flags=self.tracker_params.PNP_FLAG)
+        _, rotation, translation = cv2.solvePnP(
+            self.model_vertices,
+            pixels,
+            self.camera_params,
+            np.array([]),
+            flags=self.tracker_params.PNP_FLAG
+        )
         R_rodrigues = cv2.Rodrigues(rotation)[0]
         external_matrix = np.hstack((R_rodrigues, translation))
         self.last_matrix = external_matrix
@@ -90,25 +81,22 @@ class Tracker:
         frame_number = 2
 
         while cap.isOpened():
-            self.state.frame_number = frame_number
-            # try:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            points = self.get_points(frame, last_frame[0], last_points[0])
-            self.write_camera(tracking_result, points, frame_number)
+            try:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                points = self.get_points(frame, last_frame[0], last_points[0])
+                self.write_camera(tracking_result, points, frame_number)
 
-            predict_matrix = predict_next(tracking_result[frame_number - 1], tracking_result[frame_number - 1])
-            predicted_points = get_screen_points(self, predict_matrix)
-            last_points[0] = predicted_points
-            last_frame[0] = frame
-            print(frame_number)
-            # if frame_number == 2:
-            #     break
-            frame_number += 1
-            # except:
-            #     logging.error('Tracker broken')
-            #     break
+                predict_matrix = predict_next(tracking_result[frame_number - 1], tracking_result[frame_number - 1])
+                predicted_points = get_screen_points(self, predict_matrix)
+                last_points[0] = predicted_points
+                last_frame[0] = frame
+                frame_number += 1
+            except Exception as error:
+                logging.error('Tracker broken')
+                logging.exception(error)
+                break
 
         return tracking_result
 

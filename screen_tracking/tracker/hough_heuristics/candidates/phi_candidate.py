@@ -11,9 +11,9 @@ class PhiCandidate(Candidate):
         super().__init__()
         self.line = candidate.line
         self.current_score_ = self.collinear_predicate(last_frame_line, self.line)
-        self.overall_score_ = self.current_score_
 
-    def direction_diff(self, a, b):
+    @staticmethod
+    def direction_diff(a, b):
         phi_a = np.arctan2(a[0], a[1])
         phi_b = np.arctan2(b[0], b[1])
         return normalize_angle(phi_a - phi_b, round=np.math.pi)

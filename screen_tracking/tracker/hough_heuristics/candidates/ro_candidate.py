@@ -12,7 +12,6 @@ class RoCandidate(Candidate):
         self.tracker_params = tracker_params
         self.line = candidate.line
         self.current_score_ = self.distance_origin_near_predicate(last_frame_line, self.line)
-        self.overall_score_ = self.current_score_ + candidate.overall_score_ * self.tracker_params.PHI_SCORE_COEFF
 
     def distance_to_origin_diff(self, a, b):
         return np.abs(np.abs(a[2]) - np.abs(b[2]))

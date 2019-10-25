@@ -85,8 +85,6 @@ class TrackingDataReader:
 
     def generate_user_input_from_ground_truth(self):
         resulting_points = self.get_screen_points([1, 5, 15, 23], self.get_ground_truth())
-        # for frame, points in resulting_points.items():
-        #     points += np.random.rand(len(points), 2) * 3
         return resulting_points
 
     def compare_input(self):

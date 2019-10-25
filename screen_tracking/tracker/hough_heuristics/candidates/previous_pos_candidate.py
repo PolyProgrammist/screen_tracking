@@ -9,8 +9,8 @@ from screen_tracking.tracker.hough_heuristics.utils.geom3d import get_external_m
 class PreviousPoseCandidate(Candidate):
     def __init__(self, candidate, tracker):
         super().__init__()
-        self.lines = candidate.lines
         self.tracker = tracker
+        self.lines = candidate.lines
         self.current_score_ = self.previous_matrix_diff([line.line for line in self.lines])
 
     def previous_matrix_diff(self, lines):

@@ -12,7 +12,7 @@ class Frontier:
         self.max_show_count = None
 
     def top_current(self, **kwargs):
-        comparator = (lambda candidate: candidate.overall_score_) if kwargs.get('overall_score') else (lambda candidate: candidate.current_score_)
+        comparator = (lambda candidate: candidate.current_score_)
         result = list(sorted(self.candidates, key=comparator))
         if kwargs.get('starting_point'):
             print('kek')
@@ -20,12 +20,6 @@ class Frontier:
         if not kwargs.get('any_value'):
             result = [t for t in result if t.current_score_ <= self.max_diff_score()]
         return result[:kwargs['max_count']] if 'max_count' in kwargs else result
-
-    def overall_current(self):
-        return min(self.candidates, key=lambda candidate: candidate.overall_score_)
-
-    def best_current(self):
-        return min(self.candidates, key=lambda candidate: candidate.current_score_)
 
     def max_diff_score(self):
         return 1
