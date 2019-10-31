@@ -5,12 +5,13 @@ from .candidate import Candidate
 
 
 class GroundTruthCandidate(Candidate):
-    def __init__(self, candidate, ground_truth_matrix, tracker):
+    def __init__(self, candidate, ground_truth_matrix, tracker, previous_top):
         super().__init__()
         self.lines = candidate.lines
         self.tracker = tracker
         self.ground_truth_matrix = ground_truth_matrix
         self.current_score_ = self.ground_truth_difference([line.line for line in self.lines])
+        self.previous_top = previous_top
 
     def ground_truth_difference(self, lines):
         intersections = screen_lines_to_points(lines)

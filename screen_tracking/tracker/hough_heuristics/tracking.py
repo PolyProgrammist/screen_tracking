@@ -3,6 +3,7 @@ import logging
 import cv2
 import numpy as np
 
+from screen_tracking.common import TrackingDataReader
 from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams, TrackerState
 from screen_tracking.tracker.hough_heuristics.frontiers import (
     show_best,
@@ -11,7 +12,9 @@ from screen_tracking.tracker.hough_heuristics.frontiers import (
     RoFrontier,
     PhiFrontier,
     HoughFrontier,
-    RectFrontier
+    RectFrontier,
+    RectangleShowKFrontier,
+    GroundTruthFrontier
 )
 from screen_tracking.tracker.hough_heuristics.utils import (
     get_screen_points,
@@ -33,12 +36,13 @@ class Tracker:
     def show_list_best(self, side_frontiers):
         frame = self.state.cur_frame.copy()
         for i in range(4):
-            show_best(side_frontiers[i], frame=frame, no_show=i < 3)
+            show_best(side_frontiers[i], frame=frame, no_show=i < 3, max_count=1, starting_point=1)
 
-    def get_points(self, cur_frame, last_frame, last_points, predict_matrix):
+    def get_points(self, cur_frame, last_frame, last_points, predict_matrix, frame_number):
         self.state.cur_frame = cur_frame
         self.state.last_points = last_points
         self.state.predict_matrix = predict_matrix
+        self.state.frame_number = frame_number
         last_lines = screen_points_to_lines(last_points)
 
         hough_frontier = HoughFrontier(self)
@@ -47,9 +51,21 @@ class Tracker:
         side_frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
         side_frontiers = [RoFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
 
+        # self.show_list_best(side_frontiers)
+
         rect_frontier = RectFrontier(side_frontiers)
-        rect_frontier = PNPrmseFrontier(rect_frontier)
         rect_frontier = PreviousPoseFrontier(rect_frontier)
+        rect_frontier = PNPrmseFrontier(rect_frontier)
+        print(len(rect_frontier.candidates))
+        rect_frontier = GroundTruthFrontier(rect_frontier)
+        print('First previous top = ', rect_frontier.candidates[0].previous_top)
+        rect_frontier = PNPrmseFrontier(rect_frontier)
+        print([candidate.current_score_ for candidate in rect_frontier.top_current()])
+        rect_frontier = RectangleShowKFrontier(rect_frontier)
+        # print('Remain: ', len(rect_frontier.candidates))
+
+        # for i in range(0, 33):
+        show_best(rect_frontier, colors=[(0, 0, 255)], starting_point=0)
 
         resulting_rect = rect_frontier.top_current()[0]
         lines = [candidate.line for candidate in resulting_rect.lines]
@@ -87,13 +103,18 @@ class Tracker:
                 ret, frame = cap.read()
                 if not ret:
                     break
-                points = self.get_points(frame, last_frame[0], last_points[0], predict_matrix)
+                points = self.get_points(frame, last_frame[0], last_points[0], predict_matrix, frame_number)
                 self.write_camera(tracking_result, points, frame_number)
 
-                predict_matrix = tracking_result[frame_number]
+                reader = TrackingDataReader()
+                predict_matrix = reader.get_ground_truth()[frame_number]
+                # predict_matrix = tracking_result[frame_number]
                 predicted_points = get_screen_points(self, predict_matrix)
                 last_points[0] = predicted_points
+                print('Frame number: ', frame_number)
                 last_frame[0] = frame
+                if frame_number == 100:
+                    break
                 frame_number += 1
             except Exception as error:
                 logging.error('Tracker broken')

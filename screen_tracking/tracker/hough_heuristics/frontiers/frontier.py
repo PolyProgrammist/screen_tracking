@@ -28,9 +28,14 @@ def show_best(frontier, **kwargs):
     top = frontier.top_current(**kwargs)
     if frontier.max_show_count:
         top = top[:frontier.max_show_count]
-    for candidate in top:
-        candidate.draw(cur_frame)
+    if kwargs.get('colors'):
+        for candidate, color in zip(top, kwargs['colors']):
+            candidate.draw(cur_frame, color=color, only_lines=kwargs.get('only_lines'))
+    else:
+        for candidate in top:
+            candidate.draw(cur_frame)
     if not kwargs.get('no_show'):
         cv2.imshow('Frontier', cur_frame)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+    return cur_frame

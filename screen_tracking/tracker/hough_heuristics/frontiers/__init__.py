@@ -5,4 +5,5 @@ from .rect_frontier import RectFrontier
 from .pnp_rmse_frontier import PNPrmseFrontier
 from .previous_pose_frontier import PreviousPoseFrontier
 from .ground_truth_frontier import GroundTruthFrontier
+from .rectangle_show_k_frontier import RectangleShowKFrontier
 from .frontier import show_best
