@@ -51,21 +51,19 @@ class Tracker:
         side_frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
         side_frontiers = [RoFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
 
-        # self.show_list_best(side_frontiers)
-
         rect_frontier = RectFrontier(side_frontiers)
         rect_frontier = PreviousPoseFrontier(rect_frontier)
         rect_frontier = PNPrmseFrontier(rect_frontier)
-        print(len(rect_frontier.candidates))
         rect_frontier = GroundTruthFrontier(rect_frontier)
         print('First previous top = ', rect_frontier.candidates[0].previous_top)
-        rect_frontier = PNPrmseFrontier(rect_frontier)
+        # rect_frontier = PNPrmseFrontier(rect_frontier)
         print([candidate.current_score_ for candidate in rect_frontier.top_current()])
+        print(len(rect_frontier.top_current()))
         rect_frontier = RectangleShowKFrontier(rect_frontier)
         # print('Remain: ', len(rect_frontier.candidates))
 
-        # for i in range(0, 33):
-        show_best(rect_frontier, colors=[(0, 0, 255)], starting_point=0)
+        for i in range(0, 33):
+            show_best(rect_frontier, colors=[(0, 0, 255)], starting_point=i, only_lines=True)
 
         resulting_rect = rect_frontier.top_current()[0]
         lines = [candidate.line for candidate in resulting_rect.lines]
