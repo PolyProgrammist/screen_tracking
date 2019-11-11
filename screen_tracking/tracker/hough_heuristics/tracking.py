@@ -11,8 +11,8 @@ from screen_tracking.tracker.hough_heuristics.frontiers import (
     RoFrontier,
     PhiFrontier,
     HoughFrontier,
-    RectFrontier
-)
+    RectFrontier,
+    InOutFrontier)
 from screen_tracking.tracker.hough_heuristics.utils import (
     get_screen_points,
     screen_lines_to_points,
@@ -48,8 +48,12 @@ class Tracker:
         side_frontiers = [RoFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
 
         rect_frontier = RectFrontier(side_frontiers)
-        rect_frontier = PNPrmseFrontier(rect_frontier)
         rect_frontier = PreviousPoseFrontier(rect_frontier)
+        rect_frontier = PNPrmseFrontier(rect_frontier)
+
+        in_out_frontier = InOutFrontier(rect_frontier)
+
+        show_best(in_out_frontier)
 
         resulting_rect = rect_frontier.top_current()[0]
         lines = [candidate.line for candidate in resulting_rect.lines]
@@ -96,6 +100,8 @@ class Tracker:
                 last_frame[0] = frame
                 frame_number += 1
                 print(frame_number)
+                if frame_number == 5:
+                    break
             except Exception as error:
                 logging.error('Tracker broken')
                 logging.exception(error)

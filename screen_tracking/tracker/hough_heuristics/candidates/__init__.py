@@ -1,7 +1,3 @@
-from .hough_candidate import HoughCandidate
-from .phi_candidate import PhiCandidate
-from .ro_candidate import RoCandidate
-from .rect_candidate import RectCandidate
-from .pnp_rmse_candidate import PNPrmseCandidate
-from .previous_pos_candidate import PreviousPoseCandidate
-from .ground_truth_candidate import GroundTruthCandidate
+from .line_candidates import HoughCandidate, RoCandidate, PhiCandidate
+from .rectangle_candidates import GroundTruthCandidate, PNPrmseCandidate, PreviousPoseCandidate, RectCandidate
+from .in_out_candidates import InOutCandidate

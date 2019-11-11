@@ -2,7 +2,7 @@ import itertools
 
 from screen_tracking.tracker.hough_heuristics.candidates import RectCandidate
 
-from .frontier import Frontier
+from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
 
 
 class RectFrontier(Frontier):

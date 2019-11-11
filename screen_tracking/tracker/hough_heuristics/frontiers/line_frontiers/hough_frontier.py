@@ -4,7 +4,7 @@ import numpy as np
 from screen_tracking.tracker.hough_heuristics.candidates import HoughCandidate
 from screen_tracking.tracker.hough_heuristics.utils import cut, get_bounding_box
 
-from .frontier import Frontier
+from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
 
 
 class HoughFrontier(Frontier):

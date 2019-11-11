@@ -7,7 +7,7 @@ from screen_tracking.tracker.hough_heuristics.utils import (
     get_external_matrix
 )
 
-from .candidate import Candidate
+from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
 
 
 class PNPrmseCandidate(Candidate):

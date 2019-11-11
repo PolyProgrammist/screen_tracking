@@ -3,7 +3,7 @@ import numpy as np
 from screen_tracking.common import normalize_angle
 from screen_tracking.tracker.hough_heuristics.utils import draw_line, adjusted_abc
 
-from .candidate import Candidate
+from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
 
 
 class PhiCandidate(Candidate):

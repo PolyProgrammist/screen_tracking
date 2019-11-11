@@ -7,7 +7,7 @@ from screen_tracking.tracker.hough_heuristics.utils import (
     difference_with_predicted
 )
 
-from .candidate import Candidate
+from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
 
 
 class PreviousPoseCandidate(Candidate):
