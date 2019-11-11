@@ -1,5 +1,4 @@
 import numpy as np
-from sympy import Line, Point
 
 from screen_tracking.common import normalize_angle
 
@@ -37,7 +36,7 @@ def points_to_abc(p1, p2):
     x2, y2 = p2
     a = y2 - y1
     b = x1 - x2
-    c = a * x1 + b * y1
+    c = - a * x1 - b * y1
     ar = np.array([a, b, c])
     return ar
 
@@ -88,11 +87,6 @@ def direction_diff(last_frame_line, candidate_line):
 
 
 def distance_point_to_abc(point, line):
-    line_sym = Line(line[0], line[1])
-    point_sym = Point(point)
-    result_sym = float(point_sym.distance(line_sym))
-    # print(result_sym)
-    # print(result)
-    # line = points_to_abc(outer_line[0], outer_line[1])
-
-    return result_sym
+    line_my = adjusted_abc(line)
+    result_my = np.abs(line_my[0] * point[0] + line_my[1] * point[1] + line_my[2])
+    return result_my
