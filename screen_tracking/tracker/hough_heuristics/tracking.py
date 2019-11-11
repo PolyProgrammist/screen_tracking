@@ -95,6 +95,7 @@ class Tracker:
                 last_points[0] = predicted_points
                 last_frame[0] = frame
                 frame_number += 1
+                print(frame_number)
             except Exception as error:
                 logging.error('Tracker broken')
                 logging.exception(error)

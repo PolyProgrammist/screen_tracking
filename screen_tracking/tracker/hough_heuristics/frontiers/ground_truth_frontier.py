@@ -13,7 +13,7 @@ class GroundTruthFrontier(Frontier):
         self.max_show_count = 1
 
         reader = TrackingDataReader()
-        frame_number = 2
+        frame_number = self.tracker.state.frame_number
         ground_truth_matrix = reader.get_ground_truth()[frame_number]
 
         top = frontier.top_current()
