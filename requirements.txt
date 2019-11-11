@@ -7,3 +7,4 @@ pyyaml
 coloredlogs
 click
 scikit-image
+sympy

@@ -1,4 +1,7 @@
 import numpy as np
+from sympy import Line, Point
+
+from screen_tracking.common import normalize_angle
 
 
 def get_bounding_box(shape, last_points, margin_fraction):
@@ -72,3 +75,24 @@ def lines_intersection(line1, line2):
     x = det(d, xdiff) / div
     y = det(d, ydiff) / div
     return np.array([x, y])
+
+
+def direction_diff_adjusted_abc(a, b):
+    phi_a = np.arctan2(a[0], a[1])
+    phi_b = np.arctan2(b[0], b[1])
+    return normalize_angle(phi_a - phi_b, round=np.math.pi)
+
+
+def direction_diff(last_frame_line, candidate_line):
+    return direction_diff_adjusted_abc(adjusted_abc(last_frame_line), adjusted_abc(candidate_line))
+
+
+def distance_point_to_abc(point, line):
+    line_sym = Line(line[0], line[1])
+    point_sym = Point(point)
+    result_sym = float(point_sym.distance(line_sym))
+    # print(result_sym)
+    # print(result)
+    # line = points_to_abc(outer_line[0], outer_line[1])
+
+    return result_sym

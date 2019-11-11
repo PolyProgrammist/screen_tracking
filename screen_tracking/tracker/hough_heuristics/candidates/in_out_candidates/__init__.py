@@ -1,1 +1,3 @@
 from .in_out_candidate import InOutCandidate
+from .phi_in_out_candidate import PhiInOutCandidate
+from .distance_in_out_candidate import DistanceInOutCandidate

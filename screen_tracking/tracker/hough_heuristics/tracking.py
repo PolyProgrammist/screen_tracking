@@ -3,6 +3,8 @@ import logging
 import cv2
 import numpy as np
 
+from screen_tracking.tracker.hough_heuristics.frontiers.in_out_frontiers.distance_in_out_frontier import \
+    DistanceInOutFrontier
 from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams, TrackerState
 from screen_tracking.tracker.hough_heuristics.frontiers import (
     show_best,
@@ -12,7 +14,7 @@ from screen_tracking.tracker.hough_heuristics.frontiers import (
     PhiFrontier,
     HoughFrontier,
     RectFrontier,
-    InOutFrontier)
+    InOutFrontier, PhiInOutFrontier)
 from screen_tracking.tracker.hough_heuristics.utils import (
     get_screen_points,
     screen_lines_to_points,
@@ -51,8 +53,13 @@ class Tracker:
         rect_frontier = PreviousPoseFrontier(rect_frontier)
         rect_frontier = PNPrmseFrontier(rect_frontier)
 
+        print(len(rect_frontier.top_current()))
         in_out_frontier = InOutFrontier(rect_frontier)
-
+        print(len(in_out_frontier.top_current()))
+        in_out_frontier = PhiInOutFrontier(in_out_frontier)
+        print(len(in_out_frontier.top_current()))
+        in_out_frontier = DistanceInOutFrontier(in_out_frontier)
+        print(len(in_out_frontier.top_current()))
         show_best(in_out_frontier)
 
         resulting_rect = rect_frontier.top_current()[0]
