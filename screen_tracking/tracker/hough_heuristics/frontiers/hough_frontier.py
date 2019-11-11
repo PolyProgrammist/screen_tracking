@@ -29,10 +29,13 @@ class HoughFrontier(Frontier):
             apertureSize=self.tracker_params.APERTURE_SIZE,
             L2gradient=True
         )
+        cv2.imshow('edges', edges)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         lines = cv2.HoughLinesP(
             edges,
             1,
-            np.pi / 180,
+            1 * np.pi / 180,
             self.tracker_params.THRESHOLD_HOUGH_LINES_P,
             minLineLength=self.tracker_params.MIN_LINE_LENGTH,
             maxLineGap=self.tracker_params.MAX_LINE_GAP

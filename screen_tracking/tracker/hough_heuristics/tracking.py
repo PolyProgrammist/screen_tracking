@@ -54,14 +54,16 @@ class Tracker:
         rect_frontier = RectFrontier(side_frontiers)
         rect_frontier = PreviousPoseFrontier(rect_frontier)
         rect_frontier = PNPrmseFrontier(rect_frontier)
-        rect_frontier = GroundTruthFrontier(rect_frontier)
-        print('First previous top = ', rect_frontier.candidates[0].previous_top)
+        # rect_frontier = GroundTruthFrontier(rect_frontier)
+        # print('First previous top = ', rect_frontier.candidates[0].previous_top)
         # rect_frontier = PNPrmseFrontier(rect_frontier)
-        print([candidate.current_score_ for candidate in rect_frontier.top_current()])
-        print(len(rect_frontier.top_current()))
+        # print([candidate.current_score_ for candidate in rect_frontier.top_current()])
+        # print(len(rect_frontier.top_current()))
         rect_frontier = RectangleShowKFrontier(rect_frontier)
         # print('Remain: ', len(rect_frontier.candidates))
 
+        # if frame_number == 21:
+        i = 0
         for i in range(0, 33):
             show_best(rect_frontier, colors=[(0, 0, 255)], starting_point=i, only_lines=True)
 
@@ -88,13 +90,20 @@ class Tracker:
 
         cap = cv2.VideoCapture(self.video_source)
 
+        initial_frame_number = 1
+        cap.set(cv2.CAP_PROP_POS_FRAMES, initial_frame_number - 1)
         ret, last_frame = cap.read()
         last_frame = [last_frame]
-        last_points = [self.frame_pixels[1]]
-        frame_number = 1
+        frame_number = initial_frame_number
+        reader = TrackingDataReader()
+        ground_truth = reader.get_ground_truth()
+        last_points = [get_screen_points(self, ground_truth[frame_number])]
+        # last_points = [self.frame_pixels[frame_number]]
         self.write_camera(tracking_result, last_points[0], frame_number)
-        predict_matrix = tracking_result[frame_number]
-        frame_number = 2
+
+        predict_matrix = ground_truth[frame_number]
+        # predict_matrix = tracking_result[frame_number]
+        frame_number += 1
 
         while cap.isOpened():
             try:
@@ -104,8 +113,7 @@ class Tracker:
                 points = self.get_points(frame, last_frame[0], last_points[0], predict_matrix, frame_number)
                 self.write_camera(tracking_result, points, frame_number)
 
-                reader = TrackingDataReader()
-                predict_matrix = reader.get_ground_truth()[frame_number]
+                predict_matrix = ground_truth[frame_number]
                 # predict_matrix = tracking_result[frame_number]
                 predicted_points = get_screen_points(self, predict_matrix)
                 last_points[0] = predicted_points
