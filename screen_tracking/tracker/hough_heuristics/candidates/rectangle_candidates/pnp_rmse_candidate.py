@@ -1,13 +1,12 @@
 import numpy as np
 
+from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
 from screen_tracking.tracker.hough_heuristics.utils import (
     rectangle_draw,
     screen_lines_to_points,
     get_screen_points,
     get_external_matrix
 )
-
-from .candidate import Candidate
 
 
 class PNPrmseCandidate(Candidate):
@@ -19,6 +18,7 @@ class PNPrmseCandidate(Candidate):
 
     def pnp_rmse(self, lines):
         intersections = screen_lines_to_points(lines)
+        # TODO: inherit external matrix from parent, don't count each time
         external_matrix = get_external_matrix(self.tracker, intersections)
         points = get_screen_points(self.tracker, external_matrix)
         return np.linalg.norm(points - intersections)

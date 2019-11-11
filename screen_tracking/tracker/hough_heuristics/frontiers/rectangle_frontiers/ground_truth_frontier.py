@@ -2,14 +2,13 @@ import logging
 
 from screen_tracking.common import TrackingDataReader
 from screen_tracking.tracker.hough_heuristics.candidates import GroundTruthCandidate
-
-from .frontier import Frontier
+from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
 
 
 class GroundTruthFrontier(Frontier):
     def __init__(self, frontier):
-        logging.error('Using Ground Truth Frontier')
         super().__init__(frontier.tracker)
+        logging.error('Using Ground Truth Frontier')
         self.max_show_count = 1
 
         reader = TrackingDataReader()
@@ -18,6 +17,7 @@ class GroundTruthFrontier(Frontier):
 
         top = frontier.top_current()
         self.candidates = [GroundTruthCandidate(candidate, ground_truth_matrix, frontier.tracker) for candidate in top]
+        self.candidates = self.top_current()[:1]
 
     def max_diff_score(self):
         return 5

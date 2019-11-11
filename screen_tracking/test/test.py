@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-import coloredlogs
 import click
+import coloredlogs
 import numpy as np
 
 from screen_tracking.common import TrackingDataReader
-from screen_tracking.tracker.hough_heuristics import tracking as hough_tracking
-
 from screen_tracking.test import draw_result, show_result, compare
+from screen_tracking.tracker.hough_heuristics import tracking as hough_tracking
 
 
 @click.command()

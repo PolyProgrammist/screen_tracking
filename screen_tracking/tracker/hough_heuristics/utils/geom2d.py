@@ -1,5 +1,7 @@
 import numpy as np
 
+from screen_tracking.common import normalize_angle
+
 
 def get_bounding_box(shape, last_points, margin_fraction):
     length = 0
@@ -34,9 +36,20 @@ def points_to_abc(p1, p2):
     x2, y2 = p2
     a = y2 - y1
     b = x1 - x2
-    c = a * x1 + b * y1
+    c = - a * x1 - b * y1
     ar = np.array([a, b, c])
     return ar
+
+
+def perpendicular(line):
+    vec = points_to_abc(line[0], line[1])[:2]
+    return vec / np.linalg.norm(vec)
+
+
+def intersected_lines(lines):
+    intersections = screen_lines_to_points(lines)
+    lines = screen_points_to_lines(intersections)
+    return lines
 
 
 def adjusted_abc(line):
@@ -57,6 +70,7 @@ def screen_points_to_lines(last_points):
     return np.array(lines)
 
 
+# TODO: move to sympy
 def lines_intersection(line1, line2):
     xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
     ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
@@ -72,3 +86,35 @@ def lines_intersection(line1, line2):
     x = det(d, xdiff) / div
     y = det(d, ydiff) / div
     return np.array([x, y])
+
+
+def direction_diff_adjusted_abc(a, b):
+    phi_a = np.arctan2(a[0], a[1])
+    phi_b = np.arctan2(b[0], b[1])
+    return normalize_angle(phi_a - phi_b, round_module=np.math.pi)
+
+
+def direction_diff(last_frame_line, candidate_line):
+    return direction_diff_adjusted_abc(adjusted_abc(last_frame_line), adjusted_abc(candidate_line))
+
+
+def distance_point_to_abc(point, line):
+    line_my = adjusted_abc(line)
+    result_my = np.abs(line_my[0] * point[0] + line_my[1] * point[1] + line_my[2])
+    return result_my
+
+
+def polyarea(points):
+    x = [p[0] for p in points]
+    y = [p[1] for p in points]
+    return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
+
+
+# TODO: make some another distance between lines
+def my_segment_distance(inner_line, outer_line):
+    point = (inner_line[0] + inner_line[1]) / 2
+    return distance_point_to_abc(point, outer_line)
+
+
+def distance_lines_predicate(last_frame_line, candidate_line):
+    return my_segment_distance(last_frame_line, candidate_line)

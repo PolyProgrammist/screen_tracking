@@ -1,4 +1,5 @@
 import math
+
 import numpy as np
 
 
@@ -12,7 +13,7 @@ def screen_points(camera_params, external_matrix, model_vertices):
     return points
 
 
-def normalize_angle(angle, round=2 * math.pi):
-    angle %= round
-    angle = min(angle, round - angle)
+def normalize_angle(angle, round_module=2 * math.pi):
+    angle %= round_module
+    angle = min(angle, round_module - angle)
     return angle

@@ -1,0 +1,367 @@
+/home/polyprogrammist/work/screen_tracking/venv/bin/python /home/polyprogrammist/work/screen_tracking/screen_tracking/test/test.py
+298
+88506
+58148
+242
+3
+256
+65280
+59984
+400
+4
+179
+31862
+22172
+145
+5
+155
+23870
+21338
+180
+6
+155
+23870
+15432
+78
+7
+139
+19182
+9814
+43
+8
+392
+153272
+78016
+345
+9
+382
+145542
+76570
+240
+10
+300
+89700
+53424
+209
+11
+117
+13572
+7158
+40
+12
+191
+36290
+30064
+96
+13
+195
+37830
+34506
+68
+14
+334
+111222
+85270
+99
+15
+542
+293222
+189132
+266
+16
+471
+221370
+110038
+145
+17
+80
+6320
+6162
+16
+18
+137
+18632
+13718
+26
+19
+387
+149382
+119662
+336
+20
+202
+40602
+40068
+302
+21
+196
+38220
+23454
+78
+22
+442
+194922
+85132
+272
+23
+239
+56882
+54240
+318
+24
+161
+25760
+22762
+62
+25
+190
+35910
+35658
+158
+26
+187
+34782
+28566
+112
+27
+344
+117992
+117992
+648
+28
+174
+30102
+30102
+264
+29
+122
+14762
+14762
+104
+30
+56
+3080
+2840
+21
+31
+65
+4160
+4160
+30
+32
+141
+19740
+19740
+132
+33
+177
+31152
+27680
+138
+34
+119
+14042
+14042
+138
+35
+144
+20592
+20592
+142
+36
+217
+46872
+38332
+228
+37
+170
+28730
+28730
+240
+38
+134
+17822
+17822
+151
+39
+125
+15500
+12988
+106
+40
+94
+8742
+8678
+0
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR Tracker broken
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR list index out of range
+Traceback (most recent call last):
+  File "/home/polyprogrammist/work/screen_tracking/screen_tracking/tracker/hough_heuristics/tracking.py", line 117, in track
+    points = self.get_points(frame, last_frame[0], last_points[0], predict_matrix)
+  File "/home/polyprogrammist/work/screen_tracking/screen_tracking/tracker/hough_heuristics/tracking.py", line 81, in get_points
+    in_out_rects = in_out_frontier.top_current()[0]
+IndexError: list index out of range
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 1:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0000
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0000
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0000
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 2:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.0594
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0184
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0632
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 3:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.0411
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0256
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0441
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 4:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0303
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0271
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0520
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 5:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.0600
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0191
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0626
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 6:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.0835
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0170
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0715
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 7:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0337
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0071
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0292
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 8:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.2598
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0229
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR Projected points differ by: 0.1149
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 9:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0220
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0045
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0188
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 10:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0270
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0072
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0171
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 11:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.0412
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0402
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0924
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 12:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.0673
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0355
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0942
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 13:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0287
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0065
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0247
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 14:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.1527
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0063
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR Projected points differ by: 0.1187
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 15:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.0829
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0081
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0572
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 16:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.1331
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0201
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR Projected points differ by: 0.1244
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 17:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.1089
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0247
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR Projected points differ by: 0.1179
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 18:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.0586
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0266
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0796
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 19:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.0621
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0215
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0954
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 20:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0198
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0062
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0393
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 21:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.1171
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0143
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR Projected points differ by: 0.1318
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 22:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0158
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0068
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0452
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 23:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0293
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0121
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0366
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 24:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0215
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0060
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0240
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 25:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0164
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0065
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0264
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 26:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0374
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0077
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0423
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 27:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.0517
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0451
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR Projected points differ by: 0.1237
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 28:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0108
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0103
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0296
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 29:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0288
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0238
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0728
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 30:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0278
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0114
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0476
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 31:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0046
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0089
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0351
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 32:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0173
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0090
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0330
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 33:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0172
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0086
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0274
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 34:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0055
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0074
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0315
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 35:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.0592
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0100
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0500
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 36:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.1619
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0183
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0952
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 37:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0120
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0060
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0295
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 38:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0040
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0062
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0267
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Frame 39:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters rotation differ by: 0.0399
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0067
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0326
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Average diff:
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR External parameters rotation differ by: 0.0526
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO External parameters translation differ by: 0.0146
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] INFO Projected points differ by: 0.0579
+2019-11-12 03:44:42 polyprogrammist-pc root[28050] ERROR Untracked frames: [40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101]
+OpenCV: FFMPEG: tag 0x47504a4d/'MJPG' is not supported with codec id 7 and format 'mp4 / MP4 (MPEG-4 Part 14)'
+OpenCV: FFMPEG: fallback to use tag 0x7634706d/'mp4v'
+

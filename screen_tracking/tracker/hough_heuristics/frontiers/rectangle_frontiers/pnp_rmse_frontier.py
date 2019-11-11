@@ -1,6 +1,6 @@
 from screen_tracking.tracker.hough_heuristics.candidates import PNPrmseCandidate
 
-from .frontier import Frontier
+from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
 
 
 class PNPrmseFrontier(Frontier):
