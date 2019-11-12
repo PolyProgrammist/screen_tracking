@@ -1,5 +1,7 @@
 import cv2
 
+from screen_tracking.tracker.hough_heuristics.utils import screen_lines_to_points, screen_points_to_lines
+
 
 class Frontier:
     def __init__(self, tracker):
@@ -11,13 +13,15 @@ class Frontier:
 
     def top_current(self, **kwargs):
         comparator = (lambda candidate: candidate.current_score_)
-        result = list(sorted(self.candidates, key=comparator))
+        result = list(sorted(self.filter(self.candidates), key=comparator))
         if kwargs.get('starting_point'):
-            print('kek')
             result = result[kwargs['starting_point']:]
         if not kwargs.get('any_value'):
             result = [t for t in result if t.current_score_ <= self.max_diff_score()]
         return result[:kwargs['max_count']] if 'max_count' in kwargs else result
+
+    def filter(self, candidates):
+        return [candidate for candidate in candidates if candidate.allowed_]
 
     def max_diff_score(self):
         return 1

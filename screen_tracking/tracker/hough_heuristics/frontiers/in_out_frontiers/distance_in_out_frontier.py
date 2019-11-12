@@ -8,7 +8,7 @@ class DistanceInOutFrontier(Frontier):
         super().__init__(frontier.tracker)
         self.max_show_count = 1
         top = frontier.top_current()
-        self.candidates = [DistanceInOutCandidate(candidate) for candidate in top]
+        self.candidates = [DistanceInOutCandidate(candidate, self.tracker_params) for candidate in top]
 
     def max_diff_score(self):
-        return 1000000
+        return self.tracker_params.MAX_DIFF_IN_OUT_DISTANCE

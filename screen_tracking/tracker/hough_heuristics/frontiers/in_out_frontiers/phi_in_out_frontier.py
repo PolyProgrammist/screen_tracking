@@ -11,4 +11,4 @@ class PhiInOutFrontier(Frontier):
         self.candidates = [PhiInOutCandidate(candidate) for candidate in top]
 
     def max_diff_score(self):
-        return 0.001
+        return self.tracker_params.MAX_DIFF_IN_OUT_PHI
