@@ -90,3 +90,9 @@ def distance_point_to_abc(point, line):
     line_my = adjusted_abc(line)
     result_my = np.abs(line_my[0] * point[0] + line_my[1] * point[1] + line_my[2])
     return result_my
+
+
+def polyarea(points):
+    x = [p[0] for p in points]
+    y = [p[1] for p in points]
+    return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))

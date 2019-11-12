@@ -2,3 +2,6 @@ from .ground_truth_frontier import GroundTruthFrontier
 from .previous_pose_frontier import PreviousPoseFrontier
 from .pnp_rmse_frontier import PNPrmseFrontier
 from .rect_frontier import RectFrontier
+from .square_frontier import SquareFrontier
+from .rectangle_from_inout_frontier import RectFromInOutFrontier
+from .unique_frontier import RectUniqueFrontier

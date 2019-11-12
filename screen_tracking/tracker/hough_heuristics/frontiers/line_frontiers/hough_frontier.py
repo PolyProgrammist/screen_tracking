@@ -4,7 +4,7 @@ import numpy as np
 from screen_tracking.tracker.hough_heuristics.candidates import HoughCandidate
 from screen_tracking.tracker.hough_heuristics.utils import cut, get_bounding_box
 
-from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
+from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier, show_frame
 
 
 class HoughFrontier(Frontier):
@@ -29,9 +29,7 @@ class HoughFrontier(Frontier):
             apertureSize=self.tracker_params.APERTURE_SIZE,
             L2gradient=self.tracker_params.L2_GRADIENT
         )
-        # cv2.imshow('edges', edges)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
+        # show_frame(edges)
         lines = cv2.HoughLinesP(
             edges,
             1,

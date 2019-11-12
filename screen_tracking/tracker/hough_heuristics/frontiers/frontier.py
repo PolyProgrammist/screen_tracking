@@ -27,14 +27,24 @@ class Frontier:
         return 1
 
 
+def show_frame(cur_frame, caption='Frontier'):
+    cv2.imshow(caption, cur_frame)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
 def show_best(frontier, **kwargs):
-    cur_frame = kwargs.get('frame', frontier.state.cur_frame.copy())
     top = frontier.top_current(**kwargs)
-    if frontier.max_show_count:
-        top = top[:frontier.max_show_count]
-    for candidate in top:
-        candidate.draw(cur_frame)
-    if not kwargs.get('no_show'):
-        cv2.imshow('Frontier', cur_frame)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+    if kwargs.get('show_all'):
+        for candidate in top:
+            cur_frame = frontier.state.cur_frame.copy()
+            candidate.draw(cur_frame)
+            show_frame(cur_frame)
+    else:
+        if frontier.max_show_count:
+            top = top[:frontier.max_show_count]
+        cur_frame = kwargs.get('frame', frontier.state.cur_frame.copy())
+        for candidate in top:
+            candidate.draw(cur_frame)
+        if not kwargs.get('no_show'):
+            show_frame(cur_frame)
