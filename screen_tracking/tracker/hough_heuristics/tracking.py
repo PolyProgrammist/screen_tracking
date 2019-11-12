@@ -70,6 +70,9 @@ class Tracker:
         in_out_frontier = InOutFrontier(rect_frontier)
         print(len(in_out_frontier.top_current()))
         in_out_frontier = DistanceInOutFrontier(in_out_frontier)
+
+        # for i in range(100):
+        #     show_best(in_out_frontier, starting_point=i)
         print(len(in_out_frontier.top_current()))
         in_out_frontier = PhiInOutFrontier(in_out_frontier)
         print(len(in_out_frontier.top_current()))
