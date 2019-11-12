@@ -35,7 +35,7 @@ class Tracker:
     def show_list_best(self, side_frontiers):
         frame = self.state.cur_frame.copy()
         for i in range(4):
-            show_best(side_frontiers[i], frame=frame, no_show=i < 3, max_count=1)
+            show_best(side_frontiers[i], frame=frame, no_show=i < 3)
 
     def get_points(self, cur_frame, last_frame, last_points, predict_matrix):
         # last_points[0][1] += 1
@@ -51,21 +51,27 @@ class Tracker:
         last_lines = screen_points_to_lines(last_points)
 
         hough_frontier = HoughFrontier(self)
+        # show_best(hough_frontier)
 
         side_frontiers = [hough_frontier for _ in last_lines]
         side_frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
         side_frontiers = [RoFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
 
+        # self.show_list_best(side_frontiers)
+
         rect_frontier = RectFrontier(side_frontiers)
         rect_frontier = PreviousPoseFrontier(rect_frontier)
         rect_frontier = PNPrmseFrontier(rect_frontier)
 
+        # for i in range(100):
+        #     show_best(rect_frontier, starting_point=i)
+
         print(len(rect_frontier.top_current()))
         in_out_frontier = InOutFrontier(rect_frontier)
         print(len(in_out_frontier.top_current()))
-        in_out_frontier = PhiInOutFrontier(in_out_frontier)
-        print(len(in_out_frontier.top_current()))
         in_out_frontier = DistanceInOutFrontier(in_out_frontier)
+        print(len(in_out_frontier.top_current()))
+        in_out_frontier = PhiInOutFrontier(in_out_frontier)
         print(len(in_out_frontier.top_current()))
         ll = len(in_out_frontier.top_current())
         # great = 0
@@ -75,7 +81,11 @@ class Tracker:
         #     great += 1
         #     number += 1
         # print('great: ', great)
+        # for i in range(100):
+        #     show_best(in_out_frontier, starting_point=i)
         # exit(0)
+
+        # show_best(in_out_frontier)
 
         # resulting_rect = rect_frontier.top_current()[0]
         in_out_rects = in_out_frontier.top_current()[0]
@@ -98,16 +108,17 @@ class Tracker:
 
     def track(self):
         tracking_result = {}
-
+        initial_frame_number = 1
         cap = cv2.VideoCapture(self.video_source)
-
-        ret, last_frame = cap.read()
+        frame_number = initial_frame_number
+        last_frame = 0
+        for i in range(frame_number):
+            ret, last_frame = cap.read()
         last_frame = [last_frame]
-        last_points = [self.frame_pixels[1]]
-        frame_number = 1
+        last_points = [self.frame_pixels[frame_number]]
         self.write_camera(tracking_result, last_points[0], frame_number)
         predict_matrix = tracking_result[frame_number]
-        frame_number = 2
+        frame_number += 1
 
         while cap.isOpened():
             try:
@@ -121,10 +132,10 @@ class Tracker:
                 predicted_points = get_screen_points(self, predict_matrix)
                 last_points[0] = predicted_points
                 last_frame[0] = frame
-                frame_number += 1
                 print(frame_number)
-                # if frame_number == :
+                # if frame_number == initial_frame_number + 1:
                 #     break
+                frame_number += 1
             except Exception as error:
                 logging.error('Tracker broken')
                 logging.exception(error)

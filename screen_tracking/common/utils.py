@@ -76,6 +76,8 @@ class TrackingDataReader:
     def get_screen_points(self, frames, poses):
         result_screen_points = {}
         for frame in frames:
+            if frame not in poses:
+                continue
             result_screen_points[frame] = screen_points(
                 self.get_projection_matrix(),
                 poses[frame],
@@ -84,7 +86,7 @@ class TrackingDataReader:
         return result_screen_points
 
     def generate_user_input_from_ground_truth(self):
-        resulting_points = self.get_screen_points([1, 5, 15, 23], self.get_ground_truth())
+        resulting_points = self.get_screen_points(range(101), self.get_ground_truth())
         return resulting_points
 
     def compare_input(self):
