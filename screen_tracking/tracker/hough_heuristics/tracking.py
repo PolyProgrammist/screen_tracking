@@ -46,6 +46,8 @@ class Tracker:
 
         hough_frontier = HoughFrontier(self)
 
+        # show_best(hough_frontier)
+
         side_frontiers = [hough_frontier for _ in last_lines]
         side_frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
         side_frontiers_out = [RoFrontier(frontier, last_line, inner=False) for frontier, last_line in
@@ -53,10 +55,15 @@ class Tracker:
         side_frontiers_in = [RoFrontier(frontier, last_line, inner=True) for frontier, last_line in
                              zip(side_frontiers, last_lines)]
 
+        # self.show_list_best(side_frontiers_in)
+
         in_frontier = RectFrontier(side_frontiers_in)
         in_frontier = PreviousPoseFrontier(in_frontier)
         in_frontier = PNPrmseFrontier(in_frontier)
         in_frontier = SquareFrontier(in_frontier)
+        # in_frontier = GroundTruthFrontier(in_frontier)
+        # show_best(in_frontier, show_all=True)
+        # in_frontier.candidates = in_frontier.top_current()[:1]
 
         out_frontier = RectFrontier(side_frontiers_out)
         out_frontier = PreviousPoseFrontier(out_frontier)
@@ -69,16 +76,24 @@ class Tracker:
 
         in_out_frontier = InOutFrontier(in_frontier, out_frontier)
         print('in_out_frontier: ', len(in_out_frontier.top_current()))
-        in_out_frontier = PhiInOutFrontier(in_out_frontier)
-        print('in_out_frontier: ', len(in_out_frontier.top_current()))
         in_out_frontier = DistanceInOutFrontier(in_out_frontier)
         print('in_out_frontier: ', len(in_out_frontier.top_current()))
+        # in_out_frontier = PhiInOutFrontier(in_out_frontier)
+        print('in_out_frontier: ', len(in_out_frontier.top_current()))
+
         rect_frontier = RectFromInOutFrontier(in_out_frontier)
         rect_frontier = RectUniqueFrontier(rect_frontier)
         print('len of unique: ', len(rect_frontier.top_current()))
-        # rect_frontier = GroundTruthFrontier(rect_frontier)
         rect_frontier = PNPrmseFrontier(rect_frontier)
+        # rect_frontier = GroundTruthFrontier(rect_frontier)
+
         # show_best(rect_frontier)
+        #
+        # rect = rect_frontier.top_current()[0]
+        # for i, t in enumerate(in_out_frontier.top_current()):
+        #     if rect.lines == t.inner.lines:
+        #         show_best(in_out_frontier, starting_point=i)
+        #         break
 
         rect_frontier = rect_frontier.top_current()[0]
         lines = [candidate.line for candidate in rect_frontier.lines]
@@ -100,7 +115,7 @@ class Tracker:
 
     def track(self):
         tracking_result = {}
-        initial_frame_number = 1
+        initial_frame_number = 90
         cap = cv2.VideoCapture(self.video_source)
         frame_number = initial_frame_number
         last_frame = 0
@@ -113,11 +128,12 @@ class Tracker:
 
         while cap.isOpened():
             try:
-                print('\nFrame number: ', frame_number)
-                # if frame_number == initial_frame_number + 5:
+                # if frame_number == initial_frame_number + 1:
                 #     break
                 frame_number += 1
+                print('\nFrame number: ', frame_number)
                 self.state.frame_number = frame_number
+                # TODO: remove ground truth
                 ret, frame = cap.read()
                 if not ret:
                     break

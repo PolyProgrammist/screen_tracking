@@ -10,11 +10,16 @@ class PhiInOutCandidate(Candidate):
         self.inner = candidate.inner
         self.outer = candidate.outer
         delta = 0
-        for inner_line, outer_line in zip(self.inner.lines, self.outer.lines):
+        for i, inner_line, outer_line in zip(range(len(self.inner.lines)), self.inner.lines, self.outer.lines):
             inner_line = inner_line.line
             outer_line = outer_line.line
-            delta += direction_diff(inner_line, outer_line)
+            dir_diff = direction_diff(inner_line, outer_line)
+            if i != 0:
+                delta += dir_diff
+            # print(dir_diff)
         self.current_score_ = delta
+        # print(self.current_score_)
+        # print('new')
 
     def draw(self, frame):
         rectangle_draw(frame, self.inner)

@@ -26,10 +26,15 @@ class DistanceInOutCandidate(Candidate):
         bottom_right = 1
         top_right = 2
         top_left = 3
-        if points_inner[bottom_left][x] < points_outer[bottom_left][x] or\
-            points_inner[bottom_right][x] > points_outer[bottom_right][x] or\
-            points_inner[bottom_left][y] > points_outer[bottom_left][y] or\
-            points_inner[top_left][y] < points_outer[top_left][y]:
+        # TODO: assure inner is inner truly
+        if points_inner[bottom_left][x] < points_outer[bottom_left][x] or \
+                points_inner[bottom_left][y] > points_outer[bottom_left][y] or \
+                points_inner[bottom_right][x] > points_outer[bottom_right][x] or \
+                points_inner[bottom_right][y] > points_outer[bottom_right][y] or \
+                points_inner[top_left][x] < points_outer[top_left][x] or \
+                points_inner[top_left][y] < points_outer[top_left][y] or \
+                points_inner[top_right][x] > points_outer[top_right][x] or \
+                points_inner[top_right][y] < points_outer[top_right][y]:
             self.allowed_ = False
 
     def distance(self, inner_line, outer_line):
