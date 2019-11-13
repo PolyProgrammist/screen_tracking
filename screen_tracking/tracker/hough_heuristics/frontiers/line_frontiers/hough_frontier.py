@@ -21,6 +21,12 @@ class HoughFrontier(Frontier):
 
     def hough_lines(self, cur_frame_init, bounding_box):
         cur_frame = cut(cur_frame_init, bounding_box)
+        # cur_frame = cv2.GaussianBlur(cur_frame, (3, 3), 1)
+        # kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]])
+        # cur_frame = cv2.bilateralFilter(cur_frame, 14,51,4)
+        # cur_frame = cv2.fastNlMeansDenoisingColored(cur_frame)
+        # cur_frame = cv2.filter2D(cur_frame, -1, kernel)
+        # show_frame(cur_frame)
         gray = cv2.cvtColor(cur_frame, cv2.COLOR_BGR2GRAY)
         edges = cv2.Canny(
             gray,
@@ -32,13 +38,30 @@ class HoughFrontier(Frontier):
         # show_frame(edges)
         lines = cv2.HoughLinesP(
             edges,
-            1,
-            np.pi / 180,
+            self.tracker_params.HOUGH_DISTANCE_RESOLUTION * 1,
+            self.tracker_params.HOUGH_ANGLE_RESOLUTION * np.pi / 180,
             self.tracker_params.THRESHOLD_HOUGH_LINES_P,
             minLineLength=self.tracker_params.MIN_LINE_LENGTH,
             maxLineGap=self.tracker_params.MAX_LINE_GAP
         )
         lines = [line[0].astype(float) for line in lines]
+        # hlines = cv2.HoughLines(edges, 1, 3 * np.pi / 180, 70)
+        # lines = []
+        # print(hlines.shape)
+        # for line in hlines:
+        #     rho, theta = line[0][0], line[0][1]
+        #     a = np.cos(theta)
+        #     b = np.sin(theta)
+        #     x0 = a * rho
+        #     y0 = b * rho
+        #     x1 = int(x0 + 1000 * (-b))
+        #     y1 = int(y0 + 1000 * (a))
+        #     x2 = int(x0 - 1000 * (-b))
+        #     y2 = int(y0 - 1000 * (a))
+        #     lines.append([x1, y1, x2, y2])
+        # print(hlines)
+        # print(lines)
+
         lines = [
             line + np.array([bounding_box[0], bounding_box[1], bounding_box[0], bounding_box[1]]) for line in lines
         ]
