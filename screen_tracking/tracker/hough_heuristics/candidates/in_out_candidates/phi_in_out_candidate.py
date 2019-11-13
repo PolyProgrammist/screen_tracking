@@ -16,10 +16,7 @@ class PhiInOutCandidate(Candidate):
             dir_diff = direction_diff(inner_line, outer_line)
             if i != 0:
                 delta += dir_diff
-            # print(dir_diff)
         self.current_score_ = delta
-        # print(self.current_score_)
-        # print('new')
 
     def draw(self, frame):
         rectangle_draw(frame, self.inner)

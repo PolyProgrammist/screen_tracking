@@ -15,7 +15,7 @@ from screen_tracking.tracker.hough_heuristics.frontiers import (
     HoughFrontier,
     RectFrontier,
     InOutFrontier, PhiInOutFrontier, SquareFrontier, GroundTruthFrontier, RectFromInOutFrontier, RectUniqueFrontier,
-    GradientFrontier)
+    LineGradientFrontier, RectangleGradientFrontier)
 from screen_tracking.tracker.hough_heuristics.utils import (
     get_screen_points,
     screen_lines_to_points,
@@ -37,7 +37,7 @@ class Tracker:
     def show_list_best(self, side_frontiers):
         frame = self.state.cur_frame.copy()
         for i in range(4):
-            show_best(side_frontiers[i], frame=frame, no_show=i < 3, max_count=10)
+            show_best(side_frontiers[i], frame=frame, no_show=i < 3)
 
     def get_points(self, cur_frame, last_frame, last_points, predict_matrix):
         self.state.cur_frame = cur_frame
@@ -46,34 +46,21 @@ class Tracker:
         last_lines = screen_points_to_lines(last_points)
 
         hough_frontier = HoughFrontier(self)
-
-        # show_best(hough_frontier)
-
-        side_frontiers = [hough_frontier for _ in last_lines]
-        side_frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
+        side_frontiers_out = [hough_frontier for _ in last_lines]
+        side_frontiers_out = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers_out, last_lines)]
         side_frontiers_out = [RoFrontier(frontier, last_line, inner=False) for frontier, last_line in
-                              zip(side_frontiers, last_lines)]
+                              zip(side_frontiers_out, last_lines)]
 
-        print([len(frontier.top_current()) for frontier in side_frontiers_out])
-
-        side_frontiers_out = [GradientFrontier(frontier) for frontier in side_frontiers_out]
-
-        print([len(frontier.top_current()) for frontier in side_frontiers_out])
-
-        # self.show_list_best(side_frontiers_out)
+        side_frontiers_out = [LineGradientFrontier(frontier) for frontier in side_frontiers_out]
 
         side_frontiers_in = [RoFrontier(frontier, last_line, inner=True) for frontier, last_line in
                              zip(side_frontiers_out, last_lines)]
-
-        self.show_list_best(side_frontiers_in)
 
         in_frontier = RectFrontier(side_frontiers_in)
         in_frontier = PreviousPoseFrontier(in_frontier)
         in_frontier = PNPrmseFrontier(in_frontier)
         in_frontier = SquareFrontier(in_frontier)
-        # in_frontier = GroundTruthFrontier(in_frontier)
-        # in_frontier.candidates = in_frontier.top_current()[:1]
-        # show_best(in_frontier, show_all=True)
+        in_frontier = RectangleGradientFrontier(in_frontier)
 
         out_frontier = RectFrontier(side_frontiers_out)
         out_frontier = PreviousPoseFrontier(out_frontier)
@@ -93,7 +80,7 @@ class Tracker:
         print('len of unique: ', len(rect_frontier.top_current()))
         rect_frontier = PNPrmseFrontier(rect_frontier)
 
-        # show_best(rect_frontier, show_all=True)
+        show_best(rect_frontier, show_all=True)
 
         # rect = rect_frontier.top_current()[0]
         # for i, t in enumerate(in_out_frontier.top_current()):
@@ -105,7 +92,6 @@ class Tracker:
         lines = [candidate.line for candidate in rect_frontier.lines]
         intersections = screen_lines_to_points(lines)
         return intersections
-        # return 0
 
     def write_camera(self, tracking_result, pixels, frame):
         _, rotation, translation = cv2.solvePnP(
@@ -121,7 +107,7 @@ class Tracker:
 
     def track(self):
         tracking_result = {}
-        initial_frame_number = 1
+        initial_frame_number = 50
         cap = cv2.VideoCapture(self.video_source)
         frame_number = initial_frame_number
         last_frame = 0
@@ -134,8 +120,8 @@ class Tracker:
 
         while cap.isOpened():
             try:
-                # if frame_number == initial_frame_number + 1:
-                #     break
+                if frame_number == initial_frame_number + 1:
+                    break
                 frame_number += 1
                 print('\nFrame number: ', frame_number)
                 self.state.frame_number = frame_number

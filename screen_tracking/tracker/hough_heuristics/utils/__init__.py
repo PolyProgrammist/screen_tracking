@@ -16,3 +16,5 @@ from .geom3d import (
     difference_with_predicted,
     predict_next,
 )
+from .imgproc import processed_sobel
+from .img_utils import mean_gradient

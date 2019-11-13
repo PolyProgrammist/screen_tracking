@@ -26,10 +26,6 @@ def write_result(model_vertices, projection_matrix, video_source, tracking_resul
                 for i, point in enumerate(points):
                     cv2.line(frame, to_screen(points[i]), to_screen(points[(i + 1) % len(points)]), (0, 0, 255))
 
-            # print(frame_number)
-            # cv2.imshow('frame', frame)
-            # cv2.waitKey(0)
-            # cv2.destroyAllWindows()
             out.write(frame)
         else:
             break

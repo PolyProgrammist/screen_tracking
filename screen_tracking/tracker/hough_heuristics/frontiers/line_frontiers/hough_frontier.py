@@ -40,7 +40,7 @@ class HoughFrontier(Frontier):
             apertureSize=self.tracker_params.APERTURE_SIZE,
             L2gradient=self.tracker_params.L2_GRADIENT
         )
-        # show_frame(edges)
+        show_frame(edges)
         lines = cv2.HoughLinesP(
             edges,
             self.tracker_params.HOUGH_DISTANCE_RESOLUTION * 1,
@@ -50,7 +50,7 @@ class HoughFrontier(Frontier):
             maxLineGap=self.tracker_params.MAX_LINE_GAP
         )
         lines = [line[0].astype(float) for line in lines]
-        # hlines = cv2.HoughLines(edges, 1, 3 * np.pi / 180, 70)
+        # hlines = cv2.HoughLines(edges, 1, 3 * np.pi / 180, 30)
         # lines = []
         # print(hlines.shape)
         # for line in hlines:
