@@ -14,7 +14,8 @@ from screen_tracking.tracker.hough_heuristics.frontiers import (
     PhiFrontier,
     HoughFrontier,
     RectFrontier,
-    InOutFrontier, PhiInOutFrontier, SquareFrontier, GroundTruthFrontier, RectFromInOutFrontier, RectUniqueFrontier)
+    InOutFrontier, PhiInOutFrontier, SquareFrontier, GroundTruthFrontier, RectFromInOutFrontier, RectUniqueFrontier,
+    GradientFrontier)
 from screen_tracking.tracker.hough_heuristics.utils import (
     get_screen_points,
     screen_lines_to_points,
@@ -36,10 +37,9 @@ class Tracker:
     def show_list_best(self, side_frontiers):
         frame = self.state.cur_frame.copy()
         for i in range(4):
-            show_best(side_frontiers[i], frame=frame, no_show=i < 3, max_count=7)
+            show_best(side_frontiers[i], frame=frame, no_show=i < 3, max_count=10)
 
     def get_points(self, cur_frame, last_frame, last_points, predict_matrix):
-        cv2.imwrite('extract_lines.jpg', cur_frame)
         self.state.cur_frame = cur_frame
         self.state.last_points = last_points
         self.state.predict_matrix = predict_matrix
@@ -53,10 +53,19 @@ class Tracker:
         side_frontiers = [PhiFrontier(frontier, last_line) for frontier, last_line in zip(side_frontiers, last_lines)]
         side_frontiers_out = [RoFrontier(frontier, last_line, inner=False) for frontier, last_line in
                               zip(side_frontiers, last_lines)]
-        side_frontiers_in = [RoFrontier(frontier, last_line, inner=True) for frontier, last_line in
-                             zip(side_frontiers, last_lines)]
 
-        # self.show_list_best(side_frontiers_in)
+        print([len(frontier.top_current()) for frontier in side_frontiers_out])
+
+        side_frontiers_out = [GradientFrontier(frontier) for frontier in side_frontiers_out]
+
+        print([len(frontier.top_current()) for frontier in side_frontiers_out])
+
+        # self.show_list_best(side_frontiers_out)
+
+        side_frontiers_in = [RoFrontier(frontier, last_line, inner=True) for frontier, last_line in
+                             zip(side_frontiers_out, last_lines)]
+
+        self.show_list_best(side_frontiers_in)
 
         in_frontier = RectFrontier(side_frontiers_in)
         in_frontier = PreviousPoseFrontier(in_frontier)
@@ -84,7 +93,7 @@ class Tracker:
         print('len of unique: ', len(rect_frontier.top_current()))
         rect_frontier = PNPrmseFrontier(rect_frontier)
 
-        # show_best(rect_frontier)
+        # show_best(rect_frontier, show_all=True)
 
         # rect = rect_frontier.top_current()[0]
         # for i, t in enumerate(in_out_frontier.top_current()):
@@ -112,7 +121,7 @@ class Tracker:
 
     def track(self):
         tracking_result = {}
-        initial_frame_number = 6
+        initial_frame_number = 1
         cap = cv2.VideoCapture(self.video_source)
         frame_number = initial_frame_number
         last_frame = 0
@@ -125,8 +134,8 @@ class Tracker:
 
         while cap.isOpened():
             try:
-                if frame_number == initial_frame_number + 5:
-                    break
+                # if frame_number == initial_frame_number + 1:
+                #     break
                 frame_number += 1
                 print('\nFrame number: ', frame_number)
                 self.state.frame_number = frame_number

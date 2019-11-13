@@ -21,12 +21,17 @@ class HoughFrontier(Frontier):
 
     def hough_lines(self, cur_frame_init, bounding_box):
         cur_frame = cut(cur_frame_init, bounding_box)
-        # cur_frame = cv2.GaussianBlur(cur_frame, (3, 3), 1)
-        # kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]])
-        # cur_frame = cv2.bilateralFilter(cur_frame, 14,51,4)
-        # cur_frame = cv2.fastNlMeansDenoisingColored(cur_frame)
-        # cur_frame = cv2.filter2D(cur_frame, -1, kernel)
-        # show_frame(cur_frame)
+
+        # ddepth = cv2.CV_16S
+        # kernel_size = 3
+        # src = cv2.GaussianBlur(cur_frame, (3, 3), 0)
+        # src_gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+        # dst = cv2.Laplacian(src_gray, ddepth, ksize=kernel_size)
+        # abs_dst = cv2.convertScaleAbs(dst)
+        # print(abs_dst.dtype)
+        # show_frame(abs_dst)
+        # ret, frame = cv2.threshold(abs_dst, 20, 255, cv2.THRESH_BINARY)
+        # show_frame(frame)
         gray = cv2.cvtColor(cur_frame, cv2.COLOR_BGR2GRAY)
         edges = cv2.Canny(
             gray,
