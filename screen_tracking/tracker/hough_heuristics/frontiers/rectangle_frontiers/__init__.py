@@ -6,3 +6,4 @@ from .square_frontier import SquareFrontier
 from .rectangle_from_inout_frontier import RectFromInOutFrontier
 from .unique_frontier import RectUniqueFrontier
 from .gradient_frontier import RectangleGradientFrontier
+from .outer_variance_frontier import OuterVarianceFrontier

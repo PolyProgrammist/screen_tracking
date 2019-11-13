@@ -4,3 +4,7 @@ from .previous_pos_candidate import PreviousPoseCandidate
 from .rect_candidate import RectCandidate
 from .square_candidate import SquareCandidate
 from .gradient_candidate import RectangleGradientCandidate
+from .outer_variance_candidate import OuterVarianceCandidate
+# TODO: outer variance
+# TODO: aspect ratio
+# TODO: corners eigenvalues
