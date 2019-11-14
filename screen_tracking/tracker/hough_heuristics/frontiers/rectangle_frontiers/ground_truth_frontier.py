@@ -18,6 +18,7 @@ class GroundTruthFrontier(Frontier):
 
         top = frontier.top_current()
         self.candidates = [GroundTruthCandidate(candidate, ground_truth_matrix, frontier.tracker) for candidate in top]
+        self.candidates = self.top_current()[:1]
 
     def max_diff_score(self):
         return 5

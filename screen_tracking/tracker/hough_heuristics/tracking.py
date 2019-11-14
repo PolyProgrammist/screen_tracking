@@ -25,23 +25,27 @@ from screen_tracking.tracker.hough_heuristics.utils.geom2d import polyarea
 class Tracker:
     tracker_params = TrackerParams()
 
-    FRAMES_NUMBER_TO_TRACK = 1
-    INITIAL_FRAME = 50
+    FRAMES_NUMBER_TO_TRACK = np.inf
+    INITIAL_FRAME = 70
     PREVIOUS_GROUND_TRUTH = False
 
     SHOW_EACH_SIDE = int(1e9)
 
     def rectangle_frontiers(self, side_frontiers_in, side_frontiers_out):
         in_frontier = RectFrontier(side_frontiers_in)
+        in_frontier.print_best()
         in_frontier = PreviousPoseFrontier(in_frontier)
+        in_frontier.print_best()
         in_frontier = PNPrmseFrontier(in_frontier)
+        in_frontier.print_best()
         in_frontier = SquareFrontier(in_frontier)
+        in_frontier.print_best()
         in_frontier = RectangleGradientFrontier(in_frontier)
+        in_frontier.print_best()
         in_frontier = OuterVarianceFrontier(in_frontier)
         in_frontier.print_best()
         in_frontier = AspectRatioFrontier(in_frontier)
-        in_frontier.print_best(print_top_scores=20)
-        show_best(in_frontier, show_all=True)
+        in_frontier.print_best()
 
         out_frontier = RectFrontier(side_frontiers_out)
         out_frontier = PreviousPoseFrontier(out_frontier)

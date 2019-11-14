@@ -21,17 +21,6 @@ class HoughFrontier(Frontier):
 
     def hough_lines(self, cur_frame_init, bounding_box):
         cur_frame = cut(cur_frame_init, bounding_box)
-
-        # ddepth = cv2.CV_16S
-        # kernel_size = 3
-        # src = cv2.GaussianBlur(cur_frame, (3, 3), 0)
-        # src_gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
-        # dst = cv2.Laplacian(src_gray, ddepth, ksize=kernel_size)
-        # abs_dst = cv2.convertScaleAbs(dst)
-        # print(abs_dst.dtype)
-        # show_frame(abs_dst)
-        # ret, frame = cv2.threshold(abs_dst, 20, 255, cv2.THRESH_BINARY)
-        # show_frame(frame)
         gray = cv2.cvtColor(cur_frame, cv2.COLOR_BGR2GRAY)
         edges = cv2.Canny(
             gray,
@@ -40,7 +29,6 @@ class HoughFrontier(Frontier):
             apertureSize=self.tracker_params.APERTURE_SIZE,
             L2gradient=self.tracker_params.L2_GRADIENT
         )
-        # show_frame(edges)
         lines = cv2.HoughLinesP(
             edges,
             self.tracker_params.HOUGH_DISTANCE_RESOLUTION * 1,
@@ -50,22 +38,6 @@ class HoughFrontier(Frontier):
             maxLineGap=self.tracker_params.MAX_LINE_GAP
         )
         lines = [line[0].astype(float) for line in lines]
-        # hlines = cv2.HoughLines(edges, 1, 3 * np.pi / 180, 30)
-        # lines = []
-        # print(hlines.shape)
-        # for line in hlines:
-        #     rho, theta = line[0][0], line[0][1]
-        #     a = np.cos(theta)
-        #     b = np.sin(theta)
-        #     x0 = a * rho
-        #     y0 = b * rho
-        #     x1 = int(x0 + 1000 * (-b))
-        #     y1 = int(y0 + 1000 * (a))
-        #     x2 = int(x0 - 1000 * (-b))
-        #     y2 = int(y0 - 1000 * (a))
-        #     lines.append([x1, y1, x2, y2])
-        # print(hlines)
-        # print(lines)
 
         lines = [
             line + np.array([bounding_box[0], bounding_box[1], bounding_box[0], bounding_box[1]]) for line in lines
