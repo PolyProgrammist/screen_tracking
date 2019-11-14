@@ -11,6 +11,18 @@ class Frontier:
         self.state = self.tracker.state
         self.max_show_count = None
 
+    def __del__(self):
+        productivity = self.tracker.state.productivity.get(self.__class__.__name__)
+        if productivity:
+            cnt = productivity[0]
+            current_productivity = productivity[1]
+        else:
+            cnt = 0
+            current_productivity = 0
+        this_productivity = 1 - len(self.top_current()) / len(self.candidates)
+        next_productivity = (current_productivity * cnt + this_productivity) / (cnt + 1)
+        self.tracker.state.productivity[self.__class__.__name__] = (cnt + 1, next_productivity)
+
     def top_current(self, **kwargs):
         comparator = (lambda candidate: candidate.current_score_)
         result = list(sorted(self.filter(self.candidates), key=comparator))
@@ -43,6 +55,8 @@ def show_frame(cur_frame, caption='Frontier'):
 
 def show_best(frontier, **kwargs):
     top = frontier.top_current(**kwargs)
+    if kwargs.get('show_bad'):
+        top = frontier.top_current(any_value=True)[len(top):]
     if kwargs.get('show_all'):
         for i, candidate in enumerate(top):
             print('Candidate number: ', i + 1 + kwargs.get('starting_point', 0))

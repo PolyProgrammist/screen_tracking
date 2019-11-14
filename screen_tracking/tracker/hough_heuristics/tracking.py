@@ -121,6 +121,7 @@ class Tracker:
         return intersections
 
     def track(self):
+        self.state.productivity = {}
         tracking_result = {}
         initial_frame_number = self.INITIAL_FRAME
         cap = cv2.VideoCapture(self.video_source)
@@ -168,6 +169,10 @@ class Tracker:
                 logging.error('Tracker broken')
                 logging.exception(error)
                 break
+
+        print()
+        for key, value in self.state.productivity.items():
+            print(key, value[1])
 
         return tracking_result
 
