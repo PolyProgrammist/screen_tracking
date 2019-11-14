@@ -27,6 +27,8 @@ class TrackerParams:
     SMALLEST_SCREEN_FRAME = 3.0
     LARGEST_SCREEN_FRAME = 40
 
+    OUTER_VARIANCE_SHIFT = 1.5
+
 
 class TrackerState:
     pass

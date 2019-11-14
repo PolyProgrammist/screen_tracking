@@ -41,6 +41,17 @@ def points_to_abc(p1, p2):
     return ar
 
 
+def perpendicular(line):
+    vec = points_to_abc(line[0], line[1])[:2]
+    return vec / np.linalg.norm(vec)
+
+
+def intersected_lines(lines):
+    intersections = screen_lines_to_points(lines)
+    lines = screen_points_to_lines(intersections)
+    return lines
+
+
 def adjusted_abc(line):
     return adjust_vector_abc(points_to_abc(line[0], line[1]))
 

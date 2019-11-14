@@ -31,10 +31,23 @@ class Tracker:
     INITIAL_FRAME = 50
     PREVIOUS_GROUND_TRUTH = False
 
-    def show_list_best(self, side_frontiers):
-        frame = self.state.cur_frame.copy()
-        for i in range(4):
-            show_best(side_frontiers[i], frame=frame, no_show=i < 3)
+    SHOW_EACH_SIDE = int(1e9)
+
+    def rectangle_frontiers(self, side_frontiers_in, side_frontiers_out):
+        in_frontier = RectFrontier(side_frontiers_in)
+        in_frontier = PreviousPoseFrontier(in_frontier)
+        in_frontier = PNPrmseFrontier(in_frontier)
+        in_frontier = SquareFrontier(in_frontier)
+        in_frontier = RectangleGradientFrontier(in_frontier)
+        # in_frontier = OuterVarianceFrontier(in_frontier)
+
+        out_frontier = RectFrontier(side_frontiers_out)
+        out_frontier = PreviousPoseFrontier(out_frontier)
+        out_frontier = PNPrmseFrontier(out_frontier)
+
+        print('in_frontier: ', len(in_frontier.top_current()))
+        print('out_frontier: ', len(out_frontier.top_current()))
+        return in_frontier, out_frontier
 
     def line_frontiers(self):
         last_lines = screen_points_to_lines(self.state.last_points)
@@ -52,22 +65,6 @@ class Tracker:
                              zip(side_frontiers_out, last_lines)]
 
         return side_frontiers_in, side_frontiers_out
-
-    def rectangle_frontiers(self, side_frontiers_in, side_frontiers_out):
-        in_frontier = RectFrontier(side_frontiers_in)
-        in_frontier = PreviousPoseFrontier(in_frontier)
-        in_frontier = PNPrmseFrontier(in_frontier)
-        in_frontier = SquareFrontier(in_frontier)
-        in_frontier = RectangleGradientFrontier(in_frontier)
-        # in_frontier = OuterVarianceFrontier(in_frontier)
-
-        out_frontier = RectFrontier(side_frontiers_out)
-        out_frontier = PreviousPoseFrontier(out_frontier)
-        out_frontier = PNPrmseFrontier(out_frontier)
-
-        print('in_frontier: ', len(in_frontier.top_current()))
-        print('out_frontier: ', len(out_frontier.top_current()))
-        return in_frontier, out_frontier
 
     def in_out_frontier(self, in_frontier, out_frontier):
         in_out_frontier = InOutFrontier(in_frontier, out_frontier)
@@ -95,7 +92,7 @@ class Tracker:
         in_out_frontier = self.in_out_frontier(in_frontier, out_frontier)
         rect_frontier = self.rectangle_after_in_out(in_out_frontier)
 
-        # show_best(rect_frontier, show_all=True)
+        show_best(rect_frontier, show_all=True)
 
         rect_frontier = rect_frontier.top_current()[0]
         lines = [candidate.line for candidate in rect_frontier.lines]
@@ -152,6 +149,11 @@ class Tracker:
                 break
 
         return tracking_result
+
+    def show_list_best(self, side_frontiers):
+        frame = self.state.cur_frame.copy()
+        for i in range(4):
+            show_best(side_frontiers[i], frame=frame, no_show=i < 3, max_count=self.SHOW_EACH_SIDE)
 
     def write_camera(self, tracking_result, pixels, frame):
         _, rotation, translation = cv2.solvePnP(

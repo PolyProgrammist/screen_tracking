@@ -1,6 +1,7 @@
 import cv2
 
-from screen_tracking.tracker.hough_heuristics.utils.geom2d import screen_lines_to_points, screen_points_to_lines
+from screen_tracking.tracker.hough_heuristics.utils.geom2d import screen_lines_to_points, screen_points_to_lines, \
+    intersected_lines
 
 
 def cut(frame, bbox):
@@ -18,7 +19,6 @@ def draw_point(frame, point):
 
 def rectangle_draw(frame, candidate):
     lines = [candidate.line for candidate in candidate.lines]
-    points = screen_lines_to_points(lines)
-    lines = screen_points_to_lines(points)
+    lines = intersected_lines(lines)
     for line in lines:
         draw_line(frame, line)

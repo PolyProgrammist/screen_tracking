@@ -7,7 +7,7 @@ from screen_tracking.tracker.hough_heuristics.utils import (
     mean_gradient)
 
 from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
-from screen_tracking.tracker.hough_heuristics.utils.geom2d import polyarea, screen_points_to_lines
+from screen_tracking.tracker.hough_heuristics.utils.geom2d import polyarea, screen_points_to_lines, intersected_lines
 
 
 class RectangleGradientCandidate(Candidate):
@@ -17,8 +17,7 @@ class RectangleGradientCandidate(Candidate):
         self.current_score_ = self.gradient([line.line for line in self.lines], sobelx, sobely)
 
     def gradient(self, lines, sobelx, sobely):
-        intersections = screen_lines_to_points(lines)
-        lines = screen_points_to_lines(intersections)
+        lines = intersected_lines(lines)
         result = 0
         lines = lines
         for line in lines:
