@@ -56,6 +56,9 @@ class Tracker:
     def rectangle_frontiers(self, side_frontiers_in, side_frontiers_out):
         in_frontier = RectFrontier(side_frontiers_in)
         in_frontier.print_best()
+        # in_frontier = GroundTruthFrontier(in_frontier)
+        # show_best(in_frontier)
+
         in_frontier = PreviousPoseFrontier(in_frontier)
         in_frontier.print_best()
         in_frontier = PNPrmseFrontier(in_frontier)
