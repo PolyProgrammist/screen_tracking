@@ -39,14 +39,16 @@ class Tracker:
         in_frontier = PNPrmseFrontier(in_frontier)
         in_frontier = SquareFrontier(in_frontier)
         in_frontier = RectangleGradientFrontier(in_frontier)
-        # in_frontier = OuterVarianceFrontier(in_frontier)
+        in_frontier.print_best()
+        in_frontier = OuterVarianceFrontier(in_frontier)
+        in_frontier.print_best()
 
         out_frontier = RectFrontier(side_frontiers_out)
         out_frontier = PreviousPoseFrontier(out_frontier)
         out_frontier = PNPrmseFrontier(out_frontier)
 
-        print('in_frontier: ', len(in_frontier.top_current()))
-        print('out_frontier: ', len(out_frontier.top_current()))
+        in_frontier.print_best(caption='In frontier')
+        out_frontier.print_best(caption='Out frontier')
         return in_frontier, out_frontier
 
     def line_frontiers(self):
@@ -68,17 +70,17 @@ class Tracker:
 
     def in_out_frontier(self, in_frontier, out_frontier):
         in_out_frontier = InOutFrontier(in_frontier, out_frontier)
-        print('in_out_frontier: ', len(in_out_frontier.top_current()))
+        in_out_frontier.print_best()
         in_out_frontier = DistanceInOutFrontier(in_out_frontier)
-        print('in_out_frontier: ', len(in_out_frontier.top_current()))
+        in_out_frontier.print_best()
         in_out_frontier = PhiInOutFrontier(in_out_frontier)
-        print('in_out_frontier: ', len(in_out_frontier.top_current()))
+        in_out_frontier.print_best()
         return in_out_frontier
 
     def rectangle_after_in_out(self, in_out_frontier):
         rect_frontier = RectFromInOutFrontier(in_out_frontier)
         rect_frontier = RectUniqueFrontier(rect_frontier)
-        print('len of unique: ', len(rect_frontier.top_current()))
+        rect_frontier.print_best()
         rect_frontier = PNPrmseFrontier(rect_frontier)
         return rect_frontier
 

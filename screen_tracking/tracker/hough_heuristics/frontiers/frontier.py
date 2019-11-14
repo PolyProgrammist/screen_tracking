@@ -26,6 +26,14 @@ class Frontier:
     def max_diff_score(self):
         return 1
 
+    def print_best(self, caption=None, print_top_scores=False):
+        if not caption:
+            caption = self.__class__.__name__
+        top = self.top_current()
+        print(caption, 'len = ', len(top))
+        if print_top_scores:
+            print([candidate.current_score_ for candidate in top[:print_top_scores]])
+
 
 def show_frame(cur_frame, caption='Frontier'):
     cv2.imshow(caption, cur_frame)
@@ -36,7 +44,8 @@ def show_frame(cur_frame, caption='Frontier'):
 def show_best(frontier, **kwargs):
     top = frontier.top_current(**kwargs)
     if kwargs.get('show_all'):
-        for candidate in top:
+        for i, candidate in enumerate(top):
+            print('Candidate number: ', i + 1 + kwargs.get('starting_point', 0))
             cur_frame = frontier.state.cur_frame.copy()
             candidate.draw(cur_frame)
             show_frame(cur_frame)

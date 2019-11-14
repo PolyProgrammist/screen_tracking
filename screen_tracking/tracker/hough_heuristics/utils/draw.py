@@ -9,8 +9,8 @@ def cut(frame, bbox):
     return frame.copy()[min_y:max_y, min_x:max_x, :]
 
 
-def draw_line(frame, line):
-    cv2.line(frame, tuple(map(int, line[0])), tuple(map(int, line[1])), color=(0, 0, 255), thickness=1)
+def draw_line(frame, line, color=(0, 0, 255)):
+    cv2.line(frame, tuple(map(int, line[0])), tuple(map(int, line[1])), color=color, thickness=1)
 
 
 def draw_point(frame, point):

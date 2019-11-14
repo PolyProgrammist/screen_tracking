@@ -5,7 +5,7 @@ from screen_tracking.tracker.hough_heuristics.frontiers.frontier import show_fra
 from screen_tracking.tracker.hough_heuristics.utils import (
     rectangle_draw,
     screen_lines_to_points,
-    mean_gradient)
+    mean_gradient, draw_line)
 
 from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
 from screen_tracking.tracker.hough_heuristics.utils.geom2d import polyarea, screen_points_to_lines, perpendicular, \
@@ -23,13 +23,14 @@ class OuterVarianceCandidate(Candidate):
     def variance(self, lines, frame):
         lines = intersected_lines(lines)
         var = []
+        frame = frame.copy()
         for i, line in enumerate(lines):
             theta = perpendicular(line)
-            next_point = lines[(i + 1) % len(lines)][0]
+            next_point = lines[(i + 1) % len(lines)][1]
             inner = next_point - line[1]
             if np.dot(theta, inner) > 0:
                 theta = - theta
-            line += theta * self.outer_variance_shift
+            line = line + theta * self.outer_variance_shift
             var = np.append(var, image_line_index(line, frame))
 
         result = np.var(var, axis=0).mean()
