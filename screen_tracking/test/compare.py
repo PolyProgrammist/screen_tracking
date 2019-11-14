@@ -46,6 +46,7 @@ def points_difference(actual, expected, norm_coefficient):
     return diff
 
 
+# TODO: divide on rotation_translation and points and move to common/common.py
 def rotation_translation_points(extrinsic, projection, vertices):
     rotation = extrinsic[:3, :3]
     translation = extrinsic[:, 3:4]

@@ -91,7 +91,7 @@ def lines_intersection(line1, line2):
 def direction_diff_adjusted_abc(a, b):
     phi_a = np.arctan2(a[0], a[1])
     phi_b = np.arctan2(b[0], b[1])
-    return normalize_angle(phi_a - phi_b, round=np.math.pi)
+    return normalize_angle(phi_a - phi_b, round_module=np.math.pi)
 
 
 def direction_diff(last_frame_line, candidate_line):
