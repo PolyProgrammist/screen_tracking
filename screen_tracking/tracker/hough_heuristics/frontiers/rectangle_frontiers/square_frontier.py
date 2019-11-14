@@ -12,6 +12,7 @@ class SquareFrontier(Frontier):
         top = frontier.top_current()
         self.max_show_count = 1
 
+        # TODO: square limit according to view angle
         # print(self.tracker.predict_matrix)
         # extrinsic = self.tracker.state.predict_matrix
         # rotation = extrinsic[:3, :3]
