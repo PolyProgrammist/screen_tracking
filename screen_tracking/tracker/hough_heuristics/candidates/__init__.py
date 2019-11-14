@@ -10,6 +10,7 @@ from .rectangle_candidates.pnp_rmse_candidate import PNPrmseCandidate
 from .rectangle_candidates.rect_candidate import RectCandidate
 from .rectangle_candidates.square_candidate import SquareCandidate
 from .rectangle_candidates.gradient_candidate import RectangleGradientCandidate
+from .rectangle_candidates.aspect_ratio_candidate import AspectRatioCandidate
 
 from .in_out_candidates.in_out_candidate import InOutCandidate
 from .in_out_candidates.phi_in_out_candidate import PhiInOutCandidate

@@ -7,6 +7,7 @@ from .rectangle_frontiers.rectangle_from_inout_frontier import RectFromInOutFron
 from .rectangle_frontiers.unique_frontier import RectUniqueFrontier
 from .rectangle_frontiers.gradient_frontier import RectangleGradientFrontier
 from .rectangle_frontiers.outer_variance_frontier import OuterVarianceFrontier
+from .rectangle_frontiers.aspect_ratio_frontier import AspectRatioFrontier
 
 from .line_frontiers.hough_frontier import HoughFrontier
 from .line_frontiers.phi_frontier import PhiFrontier

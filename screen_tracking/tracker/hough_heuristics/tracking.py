@@ -13,7 +13,7 @@ from screen_tracking.tracker.hough_heuristics.frontiers import (
     HoughFrontier,
     RectFrontier,
     InOutFrontier, PhiInOutFrontier, SquareFrontier, GroundTruthFrontier, RectFromInOutFrontier, RectUniqueFrontier,
-    LineGradientFrontier, RectangleGradientFrontier, OuterVarianceFrontier, DistanceInOutFrontier)
+    LineGradientFrontier, RectangleGradientFrontier, OuterVarianceFrontier, DistanceInOutFrontier, AspectRatioFrontier)
 from screen_tracking.tracker.hough_heuristics.utils import (
     get_screen_points,
     screen_lines_to_points,
@@ -37,9 +37,11 @@ class Tracker:
         in_frontier = PNPrmseFrontier(in_frontier)
         in_frontier = SquareFrontier(in_frontier)
         in_frontier = RectangleGradientFrontier(in_frontier)
-        in_frontier.print_best()
         in_frontier = OuterVarianceFrontier(in_frontier)
         in_frontier.print_best()
+        in_frontier = AspectRatioFrontier(in_frontier)
+        in_frontier.print_best(print_top_scores=20)
+        show_best(in_frontier, show_all=True)
 
         out_frontier = RectFrontier(side_frontiers_out)
         out_frontier = PreviousPoseFrontier(out_frontier)
@@ -92,7 +94,7 @@ class Tracker:
         in_out_frontier = self.in_out_frontier(in_frontier, out_frontier)
         rect_frontier = self.rectangle_after_in_out(in_out_frontier)
 
-        show_best(rect_frontier, show_all=True)
+        # show_best(rect_frontier, show_all=True)
 
         rect_frontier = rect_frontier.top_current()[0]
         lines = [candidate.line for candidate in rect_frontier.lines]
