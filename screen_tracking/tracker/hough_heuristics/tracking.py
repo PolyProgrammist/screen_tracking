@@ -28,8 +28,8 @@ class Tracker:
     tracker_params = TrackerParams()
 
     FRAMES_NUMBER_TO_TRACK = np.inf
-    INITIAL_FRAME = 87
-    PREVIOUS_GROUND_TRUTH = True
+    INITIAL_FRAME = 2
+    PREVIOUS_GROUND_TRUTH = False
 
     SHOW_EACH_SIDE = int(1e9)
 
@@ -38,12 +38,6 @@ class Tracker:
 
         hough_frontier = HoughFrontier(self)
         side_frontiers_out = [hough_frontier for _ in last_lines]
-
-        # my_frontiers = [GroundTruthLineFrontier(frontier, i) for i, frontier in enumerate(side_frontiers_out)]
-        # for frontier in my_frontiers:
-        #     if len(frontier.top_current()) == 0:
-        #         self.show_list_best(my_frontiers)
-        # return None, None
 
         side_frontiers_out = [PhiFrontier(frontier, last_line) for frontier, last_line in
                               zip(side_frontiers_out, last_lines)]
@@ -61,8 +55,8 @@ class Tracker:
 
     def rectangle_frontiers(self, side_frontiers_in, side_frontiers_out):
         in_frontier = RectFrontier(side_frontiers_in)
-        in_frontier = GroundTruthFrontier(in_frontier)
-        show_best(in_frontier)
+        # in_frontier = GroundTruthFrontier(in_frontier)
+        # show_best(in_frontier)
         in_frontier.print_best()
         in_frontier = PreviousPoseFrontier(in_frontier)
         in_frontier.print_best()
@@ -74,7 +68,6 @@ class Tracker:
         in_frontier.print_best()
         in_frontier = OuterVarianceFrontier(in_frontier)
         in_frontier.print_best()
-        show_best(in_frontier, show_all=True)
         in_frontier = AspectRatioFrontier(in_frontier)
         in_frontier.print_best()
 
