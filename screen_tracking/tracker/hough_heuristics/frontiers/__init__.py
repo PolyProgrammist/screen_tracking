@@ -11,7 +11,7 @@ from .rectangle_frontiers.aspect_ratio_frontier import AspectRatioFrontier
 
 from .line_frontiers.hough_frontier import HoughFrontier
 from .line_frontiers.phi_frontier import PhiFrontier
-from .line_frontiers.ro_frontier import RoFrontier
+from .line_frontiers.ro_frontier import PreviousLineDistanceFrontier
 from .line_frontiers.gradient_frontier import LineGradientFrontier
 
 from .in_out_frontiers.in_out_frontier import InOutFrontier

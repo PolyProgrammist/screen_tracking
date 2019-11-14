@@ -3,12 +3,14 @@ import logging
 import cv2
 import numpy as np
 
+from screen_tracking.tracker.hough_heuristics.frontiers.line_frontiers.ground_truth_line_frontier import \
+    GroundTruthLineFrontier
 from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams, TrackerState
 from screen_tracking.tracker.hough_heuristics.frontiers import (
     show_best,
     PreviousPoseFrontier,
     PNPrmseFrontier,
-    RoFrontier,
+    PreviousLineDistanceFrontier,
     PhiFrontier,
     HoughFrontier,
     RectFrontier,
@@ -26,7 +28,7 @@ class Tracker:
     tracker_params = TrackerParams()
 
     FRAMES_NUMBER_TO_TRACK = np.inf
-    INITIAL_FRAME = 70
+    INITIAL_FRAME = 73
     PREVIOUS_GROUND_TRUTH = False
 
     SHOW_EACH_SIDE = int(1e9)
@@ -60,15 +62,21 @@ class Tracker:
 
         hough_frontier = HoughFrontier(self)
         side_frontiers_out = [hough_frontier for _ in last_lines]
+
+        side_frontiers_out = [GroundTruthLineFrontier(frontier, i) for i, frontier in enumerate(side_frontiers_out)]
+        self.show_list_best(side_frontiers_out)
+
         side_frontiers_out = [PhiFrontier(frontier, last_line) for frontier, last_line in
                               zip(side_frontiers_out, last_lines)]
-        side_frontiers_out = [RoFrontier(frontier, last_line, inner=False) for frontier, last_line in
+        side_frontiers_out = [PreviousLineDistanceFrontier(frontier, last_line, inner=False) for frontier, last_line in
                               zip(side_frontiers_out, last_lines)]
 
         side_frontiers_out = [LineGradientFrontier(frontier) for frontier in side_frontiers_out]
 
-        side_frontiers_in = [RoFrontier(frontier, last_line, inner=True) for frontier, last_line in
+        side_frontiers_in = [PreviousLineDistanceFrontier(frontier, last_line, inner=True) for frontier, last_line in
                              zip(side_frontiers_out, last_lines)]
+
+        self.show_list_best(side_frontiers_out)
 
         return side_frontiers_in, side_frontiers_out
 

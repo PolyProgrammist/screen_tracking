@@ -1,5 +1,5 @@
 from .line_candidates.hough_candidate import HoughCandidate
-from .line_candidates.ro_candidate import RoCandidate
+from .line_candidates.ro_candidate import PreviousLineDistanceCandidate
 from .line_candidates.phi_candidate import PhiCandidate
 from .line_candidates.gradient_candidate import LineGradientCandidate
 
