@@ -3,8 +3,6 @@ import logging
 import cv2
 import numpy as np
 
-from screen_tracking.tracker.hough_heuristics.frontiers.in_out_frontiers.distance_in_out_frontier import \
-    DistanceInOutFrontier
 from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams, TrackerState
 from screen_tracking.tracker.hough_heuristics.frontiers import (
     show_best,
@@ -15,7 +13,7 @@ from screen_tracking.tracker.hough_heuristics.frontiers import (
     HoughFrontier,
     RectFrontier,
     InOutFrontier, PhiInOutFrontier, SquareFrontier, GroundTruthFrontier, RectFromInOutFrontier, RectUniqueFrontier,
-    LineGradientFrontier, RectangleGradientFrontier, OuterVarianceFrontier)
+    LineGradientFrontier, RectangleGradientFrontier, OuterVarianceFrontier, DistanceInOutFrontier)
 from screen_tracking.tracker.hough_heuristics.utils import (
     get_screen_points,
     screen_lines_to_points,

@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 
 class TrackerParams:
@@ -16,6 +17,7 @@ class TrackerParams:
     MAX_GRADIENT = 30
     MAX_DIFF_GRADIENT_RECT = 5
     MAX_DIFF_OUTER_VARIANCE = 1000
+    MAX_DIFF_ASPECT_RATIO = np.inf
 
     MAX_DIFF_PHI = 0.1
     MAX_DIFF_RO_INNER = 30
