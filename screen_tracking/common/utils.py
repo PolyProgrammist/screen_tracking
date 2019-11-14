@@ -88,7 +88,7 @@ class TrackingDataReader:
         return result_screen_points
 
     def generate_user_input_from_ground_truth(self):
-        resulting_points = self.get_screen_points(range(102), self.get_ground_truth())
+        resulting_points = self.get_screen_points([1], self.get_ground_truth())
         return resulting_points
 
     def compare_input(self):
