@@ -5,7 +5,7 @@ from screen_tracking.tracker.hough_heuristics.utils import (
     rectangle_draw)
 from screen_tracking.tracker.hough_heuristics.utils.geom2d import perpendicular, \
     intersected_lines
-from screen_tracking.tracker.hough_heuristics.utils.img_utils import image_line_index
+from screen_tracking.tracker.hough_heuristics.utils import image_line_index
 
 
 class OuterVarianceCandidate(Candidate):

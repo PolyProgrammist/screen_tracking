@@ -110,8 +110,8 @@ def polyarea(points):
     return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
 
 
+# TODO: make some another distance between lines
 def my_segment_distance(inner_line, outer_line):
-    # TODO: make some another distance between lines
     point = (inner_line[0] + inner_line[1]) / 2
     return distance_point_to_abc(point, outer_line)
 

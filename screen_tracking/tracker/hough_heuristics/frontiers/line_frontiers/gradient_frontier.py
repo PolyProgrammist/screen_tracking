@@ -7,6 +7,7 @@ from screen_tracking.tracker.hough_heuristics.utils import processed_sobel
 class LineGradientFrontier(Frontier):
     def __init__(self, frontier):
         super().__init__(frontier.tracker)
+        # TODO: same in RectangleGradientFrontier, duplicate code
         frame = self.tracker.state.cur_frame
         frame = frame / 255
         sobelx = processed_sobel(frame, 1, 0)

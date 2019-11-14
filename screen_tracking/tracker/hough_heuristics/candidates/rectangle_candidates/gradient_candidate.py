@@ -20,6 +20,7 @@ class RectangleGradientCandidate(Candidate):
         for line in lines:
             result += mean_gradient(line, sobelx, sobely)
         result /= len(lines)
+        # TODO: change 1 / x to -x
         return 1 / result if result else np.inf
 
     def draw(self, frame):

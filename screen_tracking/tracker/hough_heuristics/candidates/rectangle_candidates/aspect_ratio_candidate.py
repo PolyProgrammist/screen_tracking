@@ -18,7 +18,9 @@ class AspectRatioCandidate(Candidate):
 
     @staticmethod
     def aspect_ratio(lines):
+        # TODO: inherit intersected lines from parent, don't count each time
         lines = intersected_lines(lines)
+        # TODO: get opposite line the other way
         width = my_segment_distance(lines[1], lines[3])
         height = my_segment_distance(lines[0], lines[2])
         ratio = width / height

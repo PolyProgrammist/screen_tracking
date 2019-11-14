@@ -3,7 +3,7 @@ import cv2
 from screen_tracking.tracker.hough_heuristics.utils.geom2d import intersected_lines
 
 
-def cut(frame, bbox):
+def cut_frame(frame, bbox):
     min_x, min_y, max_x, max_y = bbox
     return frame.copy()[min_y:max_y, min_x:max_x, :]
 

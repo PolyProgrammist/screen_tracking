@@ -1,3 +1,5 @@
+import logging
+
 from screen_tracking.common import TrackingDataReader
 from screen_tracking.tracker.hough_heuristics.candidates.line_candidates.ground_truth_line_candidate import \
     GroundTruthLineCandidate
@@ -9,6 +11,7 @@ from screen_tracking.tracker.hough_heuristics.utils import get_screen_points, sc
 class GroundTruthLineFrontier(Frontier):
     def __init__(self, frontier, line_number):
         super().__init__(frontier.tracker)
+        logging.error('Using Ground Truth Line Frontier')
 
         reader = TrackingDataReader()
         frame_number = self.tracker.state.frame_number

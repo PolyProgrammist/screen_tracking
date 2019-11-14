@@ -3,7 +3,7 @@ import numpy as np
 
 from screen_tracking.tracker.hough_heuristics.candidates import HoughCandidate
 from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
-from screen_tracking.tracker.hough_heuristics.utils import cut, get_bounding_box
+from screen_tracking.tracker.hough_heuristics.utils import cut_frame, get_bounding_box
 
 
 class HoughFrontier(Frontier):
@@ -19,8 +19,9 @@ class HoughFrontier(Frontier):
         self.candidates = [HoughCandidate(line) for line in hough_lines]
 
     def hough_lines(self, cur_frame_init, bounding_box):
-        cur_frame = cut(cur_frame_init, bounding_box)
+        cur_frame = cut_frame(cur_frame_init, bounding_box)
         gray = cv2.cvtColor(cur_frame, cv2.COLOR_BGR2GRAY)
+        # TODO make image frontier for Canny
         edges = cv2.Canny(
             gray,
             self.tracker_params.CANNY_THRESHOLD_1,

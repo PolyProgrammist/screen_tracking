@@ -16,6 +16,7 @@ class PreviousPoseCandidate(Candidate):
     def previous_matrix_diff(self, lines):
         intersections = screen_lines_to_points(lines)
         diff = difference_with_predicted(self.tracker, intersections)
+        # TODO: make more serious metric
         return diff[0] + diff[1]
 
     def draw(self, frame):

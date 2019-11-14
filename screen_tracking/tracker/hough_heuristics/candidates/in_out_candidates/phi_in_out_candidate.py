@@ -13,6 +13,7 @@ class PhiInOutCandidate(Candidate):
             inner_line = inner_line.line
             outer_line = outer_line.line
             dir_diff = direction_diff(inner_line, outer_line)
+            # TODO: handle outer frame differently, make it's own model
             if i != 0:
                 delta += dir_diff
         self.current_score_ = delta

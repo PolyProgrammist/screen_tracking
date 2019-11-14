@@ -7,8 +7,8 @@ from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
 
 class GroundTruthFrontier(Frontier):
     def __init__(self, frontier):
-        logging.error('Using Ground Truth Frontier')
         super().__init__(frontier.tracker)
+        logging.error('Using Ground Truth Frontier')
         self.max_show_count = 1
 
         reader = TrackingDataReader()

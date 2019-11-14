@@ -14,6 +14,7 @@ def processed_sobel(frame, x, y):
     #     [1, 1, 1]
     # ]))
 
+    # TODO: move magic number to tracker parameters
     ret, sobel_positive = cv2.threshold(frame, np.max(frame) * 0.05, np.max(frame), cv2.THRESH_TOZERO)
     frame = -frame
     ret, sobel_negative = cv2.threshold(frame, np.max(frame) * 0.05, np.max(frame), cv2.THRESH_TOZERO)

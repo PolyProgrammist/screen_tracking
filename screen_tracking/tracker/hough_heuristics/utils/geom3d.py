@@ -5,6 +5,7 @@ from screen_tracking.common import screen_points
 from screen_tracking.test.compare import external_difference
 
 
+# TODO: taking arguments as tracker is so nasty, same for other functions in this file
 def get_external_matrix(tracker, points):
     _, rotation, translation = cv2.solvePnP(
         tracker.model_vertices,
@@ -33,6 +34,7 @@ def difference_with_predicted(tracker, points):
 
 
 def predict_next(previous, current):
+    # TODO: 3, 4 - magic, use rotation(), translation()
     prev_rotation = previous[:3, :3]
     prev_translation = previous[:, 3:4]
     cur_rotation = current[:3, :3]
