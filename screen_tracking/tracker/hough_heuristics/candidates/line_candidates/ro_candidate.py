@@ -1,10 +1,5 @@
-import numpy as np
-
-from screen_tracking.tracker.hough_heuristics.utils import draw_line, adjusted_abc
 from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
-
-
-# TODO: compare distance between lines (distance between their centers, for example) instead of rho
+from screen_tracking.tracker.hough_heuristics.utils import draw_line
 from screen_tracking.tracker.hough_heuristics.utils.geom2d import distance_lines_predicate
 
 

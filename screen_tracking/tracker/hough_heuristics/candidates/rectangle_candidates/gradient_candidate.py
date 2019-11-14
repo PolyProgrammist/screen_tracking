@@ -1,13 +1,10 @@
 import numpy as np
-from cv2 import cv2
-
-from screen_tracking.tracker.hough_heuristics.utils import (
-    rectangle_draw,
-    screen_lines_to_points,
-    mean_gradient)
 
 from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
-from screen_tracking.tracker.hough_heuristics.utils.geom2d import polyarea, screen_points_to_lines, intersected_lines
+from screen_tracking.tracker.hough_heuristics.utils import (
+    rectangle_draw,
+    mean_gradient)
+from screen_tracking.tracker.hough_heuristics.utils.geom2d import intersected_lines
 
 
 class RectangleGradientCandidate(Candidate):

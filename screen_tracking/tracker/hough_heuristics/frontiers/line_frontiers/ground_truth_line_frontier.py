@@ -1,5 +1,4 @@
 from screen_tracking.common import TrackingDataReader
-from screen_tracking.tracker.hough_heuristics.candidates import PhiCandidate
 from screen_tracking.tracker.hough_heuristics.candidates.line_candidates.ground_truth_line_candidate import \
     GroundTruthLineCandidate
 

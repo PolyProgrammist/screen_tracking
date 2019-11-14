@@ -1,13 +1,12 @@
 import numpy as np
 
+from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
 from screen_tracking.tracker.hough_heuristics.utils import (
     rectangle_draw,
     screen_lines_to_points,
     get_screen_points,
     get_external_matrix
 )
-
-from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
 
 
 class PNPrmseCandidate(Candidate):

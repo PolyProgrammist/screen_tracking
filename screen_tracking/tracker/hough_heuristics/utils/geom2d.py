@@ -116,13 +116,5 @@ def my_segment_distance(inner_line, outer_line):
     return distance_point_to_abc(point, outer_line)
 
 
-def distance_to_origin_diff(line_a, line_b):
-    return np.abs(np.abs(line_a[2]) - np.abs(line_b[2]))
-
-
-def distance_origin_near_predicate(last_frame_line, candidate_line):
-    return distance_to_origin_diff(adjusted_abc(last_frame_line), adjusted_abc(candidate_line))
-
-
 def distance_lines_predicate(last_frame_line, candidate_line):
     return my_segment_distance(last_frame_line, candidate_line)

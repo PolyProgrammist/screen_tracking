@@ -1,10 +1,7 @@
 import numpy as np
 
-from screen_tracking.tracker.hough_heuristics.utils import draw_line, mean_gradient
-
 from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
-from screen_tracking.tracker.hough_heuristics.utils.geom2d import direction_diff
-from skimage import draw
+from screen_tracking.tracker.hough_heuristics.utils import draw_line, mean_gradient
 
 
 class LineGradientCandidate(Candidate):

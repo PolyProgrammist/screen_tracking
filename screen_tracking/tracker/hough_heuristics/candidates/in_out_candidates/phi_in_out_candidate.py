@@ -1,6 +1,5 @@
-from screen_tracking.tracker.hough_heuristics.utils import rectangle_draw
-
 from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
+from screen_tracking.tracker.hough_heuristics.utils import rectangle_draw
 from screen_tracking.tracker.hough_heuristics.utils.geom2d import direction_diff
 
 

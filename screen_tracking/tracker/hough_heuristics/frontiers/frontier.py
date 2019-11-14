@@ -1,6 +1,4 @@
-import cv2
-
-from screen_tracking.tracker.hough_heuristics.utils import screen_lines_to_points, screen_points_to_lines
+from screen_tracking.tracker.hough_heuristics.utils.draw import show_frame
 
 
 class Frontier:
@@ -45,12 +43,6 @@ class Frontier:
         print(caption, 'len = ', len(top))
         if print_top_scores:
             print([candidate.current_score_ for candidate in top[:print_top_scores]])
-
-
-def show_frame(cur_frame, caption='Frontier'):
-    cv2.imshow(caption, cur_frame)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
 
 
 def show_best(frontier, **kwargs):

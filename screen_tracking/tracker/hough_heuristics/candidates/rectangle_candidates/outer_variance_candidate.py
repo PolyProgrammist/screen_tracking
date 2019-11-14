@@ -1,14 +1,9 @@
 import numpy as np
-from cv2 import cv2
-
-from screen_tracking.tracker.hough_heuristics.frontiers.frontier import show_frame
-from screen_tracking.tracker.hough_heuristics.utils import (
-    rectangle_draw,
-    screen_lines_to_points,
-    mean_gradient, draw_line)
 
 from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
-from screen_tracking.tracker.hough_heuristics.utils.geom2d import polyarea, screen_points_to_lines, perpendicular, \
+from screen_tracking.tracker.hough_heuristics.utils import (
+    rectangle_draw)
+from screen_tracking.tracker.hough_heuristics.utils.geom2d import perpendicular, \
     intersected_lines
 from screen_tracking.tracker.hough_heuristics.utils.img_utils import image_line_index
 

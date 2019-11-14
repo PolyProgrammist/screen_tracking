@@ -1,7 +1,6 @@
 import cv2
 
-from screen_tracking.tracker.hough_heuristics.utils.geom2d import screen_lines_to_points, screen_points_to_lines, \
-    intersected_lines
+from screen_tracking.tracker.hough_heuristics.utils.geom2d import intersected_lines
 
 
 def cut(frame, bbox):
@@ -22,3 +21,9 @@ def rectangle_draw(frame, candidate):
     lines = intersected_lines(lines)
     for line in lines:
         draw_line(frame, line)
+
+
+def show_frame(cur_frame, caption='caption'):
+    cv2.imshow(caption, cur_frame)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()

@@ -1,6 +1,5 @@
-from screen_tracking.tracker.hough_heuristics.utils import draw_line
-
 from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
+from screen_tracking.tracker.hough_heuristics.utils import draw_line
 
 
 class HoughCandidate(Candidate):

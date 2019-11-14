@@ -1,9 +1,6 @@
-import numpy as np
-from screen_tracking.tracker.hough_heuristics.candidates import RectangleGradientCandidate, OuterVarianceCandidate
+from screen_tracking.tracker.hough_heuristics.candidates import OuterVarianceCandidate
 
-from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier, show_frame
-from screen_tracking.tracker.hough_heuristics.utils import processed_sobel
-from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams
+from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
 
 
 class OuterVarianceFrontier(Frontier):

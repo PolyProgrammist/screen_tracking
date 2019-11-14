@@ -1,7 +1,6 @@
-from screen_tracking.tracker.hough_heuristics.utils import rectangle_draw, points_to_abc
-
 from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
-from screen_tracking.tracker.hough_heuristics.utils.geom2d import distance_point_to_abc, screen_lines_to_points, \
+from screen_tracking.tracker.hough_heuristics.utils import rectangle_draw
+from screen_tracking.tracker.hough_heuristics.utils.geom2d import screen_lines_to_points, \
     my_segment_distance
 
 

@@ -3,9 +3,6 @@ import logging
 import cv2
 import numpy as np
 
-from screen_tracking.tracker.hough_heuristics.frontiers.line_frontiers.ground_truth_line_frontier import \
-    GroundTruthLineFrontier
-from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams, TrackerState
 from screen_tracking.tracker.hough_heuristics.frontiers import (
     show_best,
     PreviousPoseFrontier,
@@ -14,14 +11,13 @@ from screen_tracking.tracker.hough_heuristics.frontiers import (
     PhiFrontier,
     HoughFrontier,
     RectFrontier,
-    InOutFrontier, PhiInOutFrontier, SquareFrontier, GroundTruthFrontier, RectFromInOutFrontier, RectUniqueFrontier,
+    InOutFrontier, PhiInOutFrontier, SquareFrontier, RectFromInOutFrontier, RectUniqueFrontier,
     LineGradientFrontier, RectangleGradientFrontier, OuterVarianceFrontier, DistanceInOutFrontier, AspectRatioFrontier)
+from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerParams, TrackerState
 from screen_tracking.tracker.hough_heuristics.utils import (
     get_screen_points,
     screen_lines_to_points,
-    screen_points_to_lines,
-    draw_line)
-from screen_tracking.tracker.hough_heuristics.utils.geom2d import polyarea
+    screen_points_to_lines)
 
 
 class Tracker:
@@ -56,9 +52,6 @@ class Tracker:
     def rectangle_frontiers(self, side_frontiers_in, side_frontiers_out):
         in_frontier = RectFrontier(side_frontiers_in)
         in_frontier.print_best()
-        # in_frontier = GroundTruthFrontier(in_frontier)
-        # show_best(in_frontier)
-
         in_frontier = PreviousPoseFrontier(in_frontier)
         in_frontier.print_best()
         in_frontier = PNPrmseFrontier(in_frontier)
@@ -149,7 +142,6 @@ class Tracker:
                     self.write_camera(tracking_result, points, frame_number)
                     predict_matrix = tracking_result[frame_number]
 
-                # TODO: remove ground truth
                 if self.PREVIOUS_GROUND_TRUTH:
                     _, rotation, translation = cv2.solvePnP(
                         self.model_vertices,

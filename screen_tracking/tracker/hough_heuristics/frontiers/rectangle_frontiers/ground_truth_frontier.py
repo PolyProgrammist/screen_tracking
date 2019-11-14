@@ -2,7 +2,6 @@ import logging
 
 from screen_tracking.common import TrackingDataReader
 from screen_tracking.tracker.hough_heuristics.candidates import GroundTruthCandidate
-
 from screen_tracking.tracker.hough_heuristics.frontiers.frontier import Frontier
 
 

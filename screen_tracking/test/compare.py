@@ -1,7 +1,7 @@
 import logging
 
-import transforms3d
 import numpy as np
+import transforms3d
 from scipy.spatial import distance
 
 from screen_tracking.common import normalize_angle, screen_points
