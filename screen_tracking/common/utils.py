@@ -11,7 +11,7 @@ np.set_printoptions(precision=3, suppress=True)
 
 
 class TrackingDataReader:
-    DEFAULT_TEST = 'resources/tests/generated_tv_on'
+    DEFAULT_TEST = 'resources/tests/googleplay'
     DEFAULT_DESCRIPTION_FILE = 'test_description.yml'
     DEFAULT_VIDEO_OUTPUT = 'out.mp4'
     DEFAULT_TRACKING_OUTPUT = 'tracking_result.yml'
@@ -91,6 +91,16 @@ class TrackingDataReader:
         resulting_points = self.get_screen_points([1], self.get_ground_truth())
         return resulting_points
 
+    def user_input(self):
+        ground_truth_file = self.get_test_description()['ground_truth']
+        with open(self.relative_file(ground_truth_file)) as fin:
+            result = yaml.load(fin, Loader=yaml.FullLoader)
+            if 'pixels' in result:
+                result = {1: np.array(result['pixels'], dtype=np.float)}
+        if result is None:
+            result = self.generate_user_input_from_ground_truth()
+        return result
+
     def compare_input(self):
         return \
             self.get_model_vertices(), \
@@ -103,7 +113,7 @@ class TrackingDataReader:
             self.get_model_vertices(), \
             self.get_projection_matrix(), \
             self.relative_file(self.get_sequence_file()), \
-            self.generate_user_input_from_ground_truth(), \
+            self.user_input(), \
             self.write_result, \
             self.relative_file(self.tracking_result_output)
 
