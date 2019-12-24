@@ -7,6 +7,7 @@ import numpy as np
 from screen_tracking.common import TrackingDataReader
 from screen_tracking.test import draw_result, show_result, compare
 from screen_tracking.tracker.hough_heuristics import tracking as hough_tracking
+from screen_tracking.tracker.lukas_kanade import lukas_kanade as lukas_kanade
 
 
 @click.command()
@@ -18,7 +19,7 @@ from screen_tracking.tracker.hough_heuristics import tracking as hough_tracking
               help='Tracker result output file')
 @click.option('-s', '--steps', multiple=True, default=['tracking', 'compare', 'write_video', 'show_video'],
               help='Steps to execute. Possible steps are: tracking, compare, write_video, show_video')
-@click.option('-a', '--algorithm', type=click.Choice(['hough']), default='hough')
+@click.option('-a', '--algorithm', type=click.Choice(['hough', 'lk']), default='hough')
 def test(steps, algorithm, **kwargs):
     np.random.seed(42)
     coloredlogs.install()
@@ -28,6 +29,8 @@ def test(steps, algorithm, **kwargs):
     if 'tracking' in steps:
         if algorithm == 'hough':
             hough_tracking.track(*reader.tracker_input())
+        elif algorithm == 'lk':
+            lukas_kanade.track(*reader.tracker_input())
     if 'compare' in steps:
         compare.compare(*reader.compare_input())
     if 'write_video' in steps:

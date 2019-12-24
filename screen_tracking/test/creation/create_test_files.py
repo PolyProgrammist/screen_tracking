@@ -4,7 +4,8 @@ import yaml
 from screen_tracking.tracker.hough_heuristics.utils import screen_points_to_lines
 from screen_tracking.tracker.hough_heuristics.utils.geom2d import aspect_ratio
 
-test = '../../../resources/tests/pushka/'
+known_aspect = True
+test = '../../../resources/tests/despadown/'
 
 pixels_file = test + 'ground_truth.yml'
 model_file = test + 'model.obj'
@@ -46,6 +47,8 @@ with open(pixels_file, 'w') as fout:
 
 lines = screen_points_to_lines(points)
 aspect = aspect_ratio(lines)
+if known_aspect:
+    aspect = 1.7777
 
 height = 1
 width = aspect * height
