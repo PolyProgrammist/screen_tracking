@@ -93,10 +93,11 @@ class TrackingDataReader:
 
     def user_input(self):
         ground_truth_file = self.get_test_description()['ground_truth']
+        result = None
         with open(self.relative_file(ground_truth_file)) as fin:
-            result = yaml.load(fin, Loader=yaml.FullLoader)
-            if 'pixels' in result:
-                result = {1: np.array(result['pixels'], dtype=np.float)}
+            content = yaml.load(fin, Loader=yaml.FullLoader)
+            if 'pixels' in content:
+                result = {1: np.array(content['pixels'], dtype=np.float)}
         if result is None:
             result = self.generate_user_input_from_ground_truth()
         return result
