@@ -14,7 +14,7 @@ def write_result(model_vertices, projection_matrix, video_source, tracking_resul
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    out = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*'MJPG'), fps, (width, height))
+    out = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*"mp4v"), fps, (width, height))
 
     while cap.isOpened():
         ret, frame = cap.read()

@@ -11,9 +11,9 @@ np.set_printoptions(precision=3, suppress=True)
 
 
 class TrackingDataReader:
-    DEFAULT_TEST = 'resources/tests/googleplay'
+    DEFAULT_TEST = 'resources/tests/generated_tv_on'
     DEFAULT_DESCRIPTION_FILE = 'test_description.yml'
-    DEFAULT_VIDEO_OUTPUT = 'out.mp4'
+    DEFAULT_VIDEO_OUTPUT = 'out.mov'
     DEFAULT_TRACKING_OUTPUT = 'tracking_result.yml'
 
     def __init__(self, **kwargs):
