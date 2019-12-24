@@ -6,8 +6,11 @@ import numpy as np
 
 from screen_tracking.common import TrackingDataReader
 from screen_tracking.test import draw_result, show_result, compare
+from screen_tracking.tracker.common_tracker import common_track
 from screen_tracking.tracker.hough_heuristics import tracking as hough_tracking
+from screen_tracking.tracker.hough_heuristics.tracking import HoughTracker
 from screen_tracking.tracker.lukas_kanade import lukas_kanade as lukas_kanade
+from screen_tracking.tracker.lukas_kanade.lukas_kanade import LukasKanadeTracker
 
 
 @click.command()
@@ -28,9 +31,9 @@ def test(steps, algorithm, **kwargs):
     )
     if 'tracking' in steps:
         if algorithm == 'hough':
-            hough_tracking.track(*reader.tracker_input())
+            common_track(*reader.tracker_input(), HoughTracker)
         elif algorithm == 'lk':
-            lukas_kanade.track(*reader.tracker_input())
+            common_track(*reader.tracker_input(), LukasKanadeTracker)
     if 'compare' in steps:
         compare.compare(*reader.compare_input())
     if 'write_video' in steps:

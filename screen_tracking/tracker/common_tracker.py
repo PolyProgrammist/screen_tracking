@@ -1,35 +1,27 @@
 import logging
 
-import numpy as np
 import cv2
+import numpy as np
 
-from screen_tracking.tracker.common_tracker import Tracker
+from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerState
 from screen_tracking.tracker.hough_heuristics.utils import get_screen_points
-from screen_tracking.tracker.lukas_kanade.lukas_params import TrackerParams
 
 
-class LukasKanadeTracker(Tracker):
-    tracker_params = TrackerParams()
+class Tracker:
+    tracker_params = None
+
+    FRAMES_NUMBER_TO_TRACK = 50
+    INITIAL_FRAME = 1
+    PREVIOUS_GROUND_TRUTH = False
+
+    SHOW_EACH_SIDE = int(1e9)
 
     def __init__(self, model_vertices, camera_params, video_source, frame_pixels):
-        super().__init__(model_vertices, camera_params, video_source, frame_pixels)
-
-    def get_points(self, cur_frame, last_frame, last_points, predict_matrix):
-
-        last_points = np.array([[point] for point in last_points], dtype=np.float32)
-        lk_params = dict(winSize=(70, 70),
-                         maxLevel=4,
-                         criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 100, 0.001))
-
-        color = np.random.randint(0, 255, (100, 3))
-
-        old_gray = cv2.cvtColor(last_frame, cv2.COLOR_BGR2GRAY)
-
-        frame = cur_frame
-        frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, last_points, None, **lk_params)
-        good_new = p1[st == 1]
-        return good_new
+        self.model_vertices = model_vertices
+        self.camera_params = camera_params
+        self.video_source = video_source
+        self.frame_pixels = frame_pixels
+        self.state = TrackerState()
 
     def write_camera(self, tracking_result, pixels, frame):
         _, rotation, translation = cv2.solvePnP(
@@ -97,3 +89,26 @@ class LukasKanadeTracker(Tracker):
             print(key, value[1])
 
         return tracking_result
+
+    def get_points(self, cur_frame, last_frame, last_points, predict_matrix):
+        pass
+
+
+def common_track(
+        model_vertices,
+        camera_params,
+        video_source,
+        frame_pixels,
+        write_callback,
+        result_file,
+        tracker_type,
+        tracker_params=None
+):
+    tracker = tracker_type(model_vertices, camera_params, video_source, frame_pixels)
+
+    if tracker_params is not None:
+        tracker.tracker_params = tracker_params
+
+    result = tracker.track()
+    write_callback(result)
+    return result
