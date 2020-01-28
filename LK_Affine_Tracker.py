@@ -194,14 +194,17 @@ outer_rate = 0.3
 cap = cv2.VideoCapture(video_source)
 
 ret, T_x_image = cap.read()
-last_frame = T_x_image
 T_x_image = convert_lab(T_x_image)
 T_x_image = cv.cvtColor(T_x_image, cv.COLOR_BGR2GRAY)
 t_x_mean = np.mean(T_x_image)
 
 points = [
-    [250, 780]
+    [279, 358],
+    [642, 358],
+    [646, 161],
+    [275, 139],
 ]
+points[0] = [250, 780]
 
 inner_rate = 1 - outer_rate
 
@@ -215,8 +218,7 @@ xyranges = [
 # x_range, y_range = point_selector(T_x_image)
 x_range, y_range = xyranges[0]
 print(x_range, y_range)
-xyrange = xyranges[0]
-real_point = [(xyrange[0][1] + xyrange[0][0]) // 2, (xyrange[1][1] + xyrange[1][0]) // 2]
+
 T_x_array = get_T_x_array(T_x_image, x_range, y_range)
 T_x_coordinates = get_coordinates_array(x_range, y_range)
 
@@ -231,27 +233,8 @@ height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 output_file = 'out.mov'
 out = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*"mp4v"), fps, (width, height))
 
-def simplelukastracker(lastpoint, cur_frame, last_frame):
-    last_points = np.array([[lastpoint]], dtype=np.float32)
-    lk_params = dict(winSize=(delta_point // 2, delta_point // 2),
-                     maxLevel=4,
-                     criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 100, 0.001))
-
-
-    old_gray = cv2.cvtColor(last_frame, cv2.COLOR_BGR2GRAY)
-
-    frame = cur_frame
-    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, last_points, None, **lk_params)
-    good_new = p1[st == 1]
-    print(good_new[0])
-    return good_new[0]
-
 while cap.isOpened():
     ret, image = cap.read()
-    cur_frame = image
-    if not ret:
-        break
     image = convert_lab(image)
     cv.waitKey(1)
     gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
@@ -261,31 +244,18 @@ while cap.isOpened():
     count = count + 1
 
     rounds = 0
-    # while True:
-    #     p, del_p, p_norm, new_img_coordinates, new_vertex, sane = affineLKtracker(T_x_coordinates, T_x_array, gray,
-    #                                                                               x_range, y_range, p, sobelx, sobely)
-    #     if p_norm <= threshold or sane == False or rounds > 50:
-    #         break
-    #     rounds += 1
-    real_point = simplelukastracker(real_point, cur_frame, last_frame)
-    rect_img = image.copy()
-    color = (255, 0, 0)
-    start_point = (int(real_point[0]) - delta_point // 2, int(real_point[1]) - delta_point // 2)
-    end_point = (int(real_point[0]) + delta_point // 2, int(real_point[1]) + delta_point // 2)
-    print(start_point, end_point)
-    cv2.rectangle(
-        rect_img,
-        start_point,
-        end_point,
-        color,
-        2
-    )
-    # rect_img = draw_rectangle(image, new_vertex)
+    while True:
+        p, del_p, p_norm, new_img_coordinates, new_vertex, sane = affineLKtracker(T_x_coordinates, T_x_array, gray,
+                                                                                  x_range, y_range, p, sobelx, sobely)
+        if p_norm <= threshold or sane == False or rounds > 50:
+            break
+        rounds += 1
+
+    rect_img = draw_rectangle(image, new_vertex)
 
     if ret:
         out.write(rect_img)
     cv.imshow('rect', rect_img)
-    last_frame = cur_frame
 
 out.release()
 
