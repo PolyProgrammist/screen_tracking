@@ -2,6 +2,7 @@ import glob
 import cv2 as cv
 import numpy as np
 import cv2
+from scipy.interpolate import RectBivariateSpline
 
 
 # all homogenious coordinates of a rectangle
@@ -194,17 +195,14 @@ outer_rate = 0.3
 cap = cv2.VideoCapture(video_source)
 
 ret, T_x_image = cap.read()
+last_frame = T_x_image
 T_x_image = convert_lab(T_x_image)
 T_x_image = cv.cvtColor(T_x_image, cv.COLOR_BGR2GRAY)
 t_x_mean = np.mean(T_x_image)
 
 points = [
-    [279, 358],
-    [642, 358],
-    [646, 161],
-    [275, 139],
+    [250, 780]
 ]
-points[0] = [250, 780]
 
 inner_rate = 1 - outer_rate
 
@@ -218,7 +216,10 @@ xyranges = [
 # x_range, y_range = point_selector(T_x_image)
 x_range, y_range = xyranges[0]
 print(x_range, y_range)
-
+xyrange = xyranges[0]
+real_point = [(xyrange[0][1] + xyrange[0][0]) // 2, (xyrange[1][1] + xyrange[1][0]) // 2]
+start_point = (int(real_point[0]) - delta_point // 2, int(real_point[1]) - delta_point // 2)
+end_point = (int(real_point[0]) + delta_point // 2, int(real_point[1]) + delta_point // 2)
 T_x_array = get_T_x_array(T_x_image, x_range, y_range)
 T_x_coordinates = get_coordinates_array(x_range, y_range)
 
@@ -233,8 +234,134 @@ height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 output_file = 'out.mov'
 out = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*"mp4v"), fps, (width, height))
 
+def simplelukastracker(lastpoint, cur_frame, last_frame):
+    last_points = np.array([[lastpoint]], dtype=np.float32)
+    lk_params = dict(winSize=(delta_point // 2, delta_point // 2),
+                     maxLevel=4,
+                     criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 100, 0.001))
+
+
+    old_gray = cv2.cvtColor(last_frame, cv2.COLOR_BGR2GRAY)
+
+    frame = cur_frame
+    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, last_points, None, **lk_params)
+    good_new = p1[st == 1]
+    print(good_new[0])
+    return good_new[0]
+
+
+
+def LucasKanadeAffine(It, It1):
+    # Input:
+    #	It: template image
+    #	It1: Current image
+    # Output:
+    #	M: the Affine warp matrix [2x3 numpy array]
+    # put your implementation here
+    M = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
+    threshold = 1
+    dp = 10
+    p = np.zeros(6)
+    Iy, Ix = np.gradient(It1)
+    x1, y1, x2, y2 = 0, 0, It.shape[1], It.shape[0]
+    while np.square(dp).sum() > threshold:
+
+        W = np.array([[1.0 + p[0], p[1], p[2]],
+                      [p[3], 1.0 + p[4], p[5]]])
+
+        x1_w = W[0, 0] * x1 + W[0, 1] * y1 + W[0, 2]
+        y1_w = W[1, 0] * x1 + W[1, 1] * y1 + W[1, 2]
+        x2_w = W[0, 0] * x2 + W[0, 1] * y2 + W[0, 2]
+        y2_w = W[0, 0] * x2 + W[0, 1] * y2 + W[0, 2]
+
+        x = np.arange(0, It.shape[0], 1)
+        y = np.arange(0, It.shape[1], 1)
+
+        c = np.linspace(x1, x2, It.shape[1])
+        r = np.linspace(y1, y2, It.shape[0])
+        cc, rr = np.meshgrid(c, r)
+
+        cw = np.linspace(x1_w, x2_w, It.shape[1])
+        rw = np.linspace(y1_w, y2_w, It.shape[0])
+        ccw, rrw = np.meshgrid(cw, rw)
+
+        spline = RectBivariateSpline(x, y, It)
+        T = spline.ev(rr, cc)
+
+        spline1 = RectBivariateSpline(x, y, It1)
+        warpImg = spline1.ev(rrw, ccw)
+
+        # compute error image
+        # errImg is (n,1)
+        err = T - warpImg
+        errImg = err.reshape(-1, 1)
+
+        # compute gradient
+        spline_gx = RectBivariateSpline(x, y, Ix)
+        Ix_w = spline_gx.ev(rrw, ccw)
+
+        spline_gy = RectBivariateSpline(x, y, Iy)
+        Iy_w = spline_gy.ev(rrw, ccw)
+        # I is (n,2)
+        I = np.vstack((Ix_w.ravel(), Iy_w.ravel())).T
+
+        # evaluate delta = I @ jac is (n, 6)
+        delta = np.zeros((It.shape[0] * It.shape[1], 6))
+
+        for i in range(It.shape[0]):
+            for j in range(It.shape[1]):
+                # I is (1,2) for each pixel
+                # Jacobiani is (2,6)for each pixel
+                I_indiv = np.array([I[i * It.shape[1] + j]]).reshape(1, 2)
+
+                jac_indiv = np.array([[j, 0, i, 0, 1, 0],
+                                      [0, j, 0, i, 0, 1]])
+                delta[i * It.shape[1] + j] = I_indiv @ jac_indiv
+
+        # compute Hessian Matrix
+        # H is (6,6)
+        H = delta.T @ delta
+
+        # compute dp
+        # dp is (6,6)@(6,n)@(n,1) = (6,1)
+        dp = np.linalg.inv(H) @ (delta.T) @ errImg
+
+        # update parameters
+        p[0] += dp[0, 0]
+        p[1] += dp[1, 0]
+        p[2] += dp[2, 0]
+        p[3] += dp[3, 0]
+        p[4] += dp[4, 0]
+        p[5] += dp[5, 0]
+
+    M = np.array([[1.0 + p[0], p[1], p[2]], [p[3], 1.0 + p[4], p[5]]])
+    return M
+
+
+def prolucaswrapped(real_point, start_point, end_point, last_frame, cur_frame):
+    last_frame = cv2.cvtColor(last_frame, cv2.COLOR_RGB2GRAY)
+    cur_frame = cv2.cvtColor(cur_frame, cv2.COLOR_RGB2GRAY)
+    delta = 0
+    template = last_frame[start_point[1] - delta:end_point[1] + delta,start_point[0] - delta:end_point[0] + delta].copy()
+    cur_frame = cur_frame[start_point[1] - delta:end_point[1] + delta,start_point[0] - delta:end_point[0] + delta].copy()
+    # cv2.imshow('cur', cur_frame)
+    # cv2.imshow('template', template)
+    # cv2.waitKey(0)
+    matrix = LucasKanadeAffine(template, cur_frame)
+    real_point = np.array([[real_point[0]], [real_point[1]], [1]])
+    real_point = matrix @ real_point
+    print(real_point)
+    return real_point[0][0], real_point[1][0]
+
+
 while cap.isOpened():
+    if count > 25:
+        break
     ret, image = cap.read()
+    cur_frame = image
+    if not ret:
+        break
     image = convert_lab(image)
     cv.waitKey(1)
     gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
@@ -244,18 +371,32 @@ while cap.isOpened():
     count = count + 1
 
     rounds = 0
-    while True:
-        p, del_p, p_norm, new_img_coordinates, new_vertex, sane = affineLKtracker(T_x_coordinates, T_x_array, gray,
-                                                                                  x_range, y_range, p, sobelx, sobely)
-        if p_norm <= threshold or sane == False or rounds > 50:
-            break
-        rounds += 1
+    # while True:
+    #     p, del_p, p_norm, new_img_coordinates, new_vertex, sane = affineLKtracker(T_x_coordinates, T_x_array, gray,
+    #                                                                               x_range, y_range, p, sobelx, sobely)
+    #     if p_norm <= threshold or sane == False or rounds > 50:
+    #         break
+    #     rounds += 1
 
-    rect_img = draw_rectangle(image, new_vertex)
+    real_point = prolucaswrapped(real_point, start_point, end_point, cur_frame, last_frame)
+    rect_img = image.copy()
+    color = (255, 0, 0)
+    start_point = (int(real_point[0]) - delta_point // 2, int(real_point[1]) - delta_point // 2)
+    end_point = (int(real_point[0]) + delta_point // 2, int(real_point[1]) + delta_point // 2)
+    print(start_point, end_point)
+    cv2.rectangle(
+        rect_img,
+        start_point,
+        end_point,
+        color,
+        2
+    )
+    # rect_img = draw_rectangle(image, new_vertex)
 
     if ret:
         out.write(rect_img)
     cv.imshow('rect', rect_img)
+    last_frame = cur_frame
 
 out.release()
 
