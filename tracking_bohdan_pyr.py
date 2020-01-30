@@ -146,30 +146,76 @@ def show_rectangle(img, patch_size, pose):
     np.array(result, np.int32)
     img = img.copy()
     cv2.polylines(img, np.array([result], np.int32), True, (0, 255, 255))
-    cv2.imshow('rect', img)
-    cv2.waitKey(0)
+    # cv2.imshow('rect', img)
+    # cv2.waitKey(0)
+    return img
+
+def convert_to_track(img):
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    img = img / 255.0
+    return img.astype(np.float32)
 
 
 def main():
-    img_0 = (cv2.imread(imgname(1), cv2.IMREAD_GRAYSCALE) / 255.0).astype(np.float32)
+    # img_0 = (cv2.imread(imgname(1), cv2.IMREAD_GRAYSCALE) / 255.0).astype(np.float32)
+    # img_0 = cv2.imread(imgname(1))
+    # img_0 = convert_to_track(img_0)
+
+    cap = cv2.VideoCapture('sequence.mp4')
+
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    output_file = 'out.mov'
+    out = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*"mp4v"), fps, (width, height))
+
+
+
+    ret, frame = cap.read()
+    img_0 = convert_to_track(frame)
+    # cv2.imwrite('1.jpg', frame)
+    # cv2.imshow('img', frame)
+    # cv2.waitKey(0)
     pose_0 = np.array([
-        [1, 0, -105.0],
-        [0, 1, -340.0]
+        # [1, 0, -105.0],
+        # [0, 1, -340.0]
+        [1, 0, -200.0],
+        [0, 1, -720.0]
     ])
 
-    for img_number in range(2, 100):
-        img_1 = (cv2.imread(imgname(img_number), cv2.IMREAD_GRAYSCALE) / 255.0).astype(np.float32)
+    img_number = 0
+    while cap.isOpened():
+        print(img_number)
+        ret, frame = cap.read()
+        if not ret:
+            break
+        img_number += 1
+        img_1 = convert_to_track(frame)
+        # img_1 = (cv2.imread(imgname(img_number), cv2.IMREAD_GRAYSCALE) / 255.0).astype(np.float32)
 
         # show_diff(img_0, img_1, pose_0, pose_0)
 
         patch_size = [101, 101]
         pose_1 = track(patch_size, img_0, img_1, pose_0)
 
-        if img_number % 10 == 0:
-            real_img = cv2.imread(imgname(img_number))
-            show_rectangle(real_img, patch_size, pose_1)
+        # if img_number % 10 == 0:
+        real_img = frame
+        show_rectangle(real_img, patch_size, pose_1)
 
         img_0 = img_1
         pose_0 = pose_1
+
+        print(np.max(img_1), np.min(img_1))
+
+        img_to_write = (img_1 * 255).astype(np.uint8)
+        print(np.min(img_to_write), np.max(img_to_write))
+        if ret:
+            # cv2.imshow('img', img_to_write)
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
+            out.write(show_rectangle(frame, patch_size, pose_1))
+
+    out.release()
 
 main()
