@@ -11,7 +11,7 @@ np.set_printoptions(precision=3, suppress=True)
 
 
 class TrackingDataReader:
-    DEFAULT_TEST = 'resources/tests/despadown'
+    DEFAULT_TEST = 'resources/tests/generated_tv_on'
     DEFAULT_DESCRIPTION_FILE = 'test_description.yml'
     DEFAULT_VIDEO_OUTPUT = 'out.mov'
     DEFAULT_TRACKING_OUTPUT = 'tracking_result.yml'
@@ -88,7 +88,7 @@ class TrackingDataReader:
         return result_screen_points
 
     def generate_user_input_from_ground_truth(self):
-        resulting_points = self.get_screen_points([1], self.get_ground_truth())
+        resulting_points = self.get_screen_points(list(range(102)), self.get_ground_truth())
         return resulting_points
 
     def user_input(self):

@@ -10,9 +10,9 @@ from screen_tracking.tracker.hough_heuristics.utils import get_screen_points
 class Tracker:
     tracker_params = None
 
-    FRAMES_NUMBER_TO_TRACK = 50
+    FRAMES_NUMBER_TO_TRACK = np.inf
     INITIAL_FRAME = 1
-    PREVIOUS_GROUND_TRUTH = False
+    PREVIOUS_GROUND_TRUTH = True
 
     SHOW_EACH_SIDE = int(1e9)
 

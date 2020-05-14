@@ -3,6 +3,7 @@
 import click
 import coloredlogs
 import numpy as np
+from time import time
 
 from screen_tracking.common import TrackingDataReader
 from screen_tracking.test import draw_result, show_result, compare
@@ -30,10 +31,14 @@ def test(steps, algorithm, **kwargs):
         **kwargs
     )
     if 'tracking' in steps:
+        start = time()
         if algorithm == 'hough':
             common_track(*reader.tracker_input(), HoughTracker)
         elif algorithm == 'lk':
             common_track(*reader.tracker_input(), LukasKanadeTracker)
+        stop = time()
+        print("Time elapsed: " + str(stop - start))
+
     if 'compare' in steps:
         compare.compare(*reader.compare_input())
     if 'write_video' in steps:
