@@ -62,16 +62,20 @@ class TrackingDataReader:
     def write_result(self, result):
         with open(self.relative_file(self.tracking_result_output), 'w') as fout:
             to_write = []
-            for frame, matrix in result.items():
-                frame_result = {
-                    'frame': frame,
-                    'pose': {
-                        'R': matrix[:3, :3].tolist(),
-                        't': matrix[:3, 3].T.reshape(3).tolist()
+            if 'broken' in result:
+                to_write.append({'broken': True})
+            else:
+                for frame, matrix in result.items():
+                    frame_result = {
+                        'frame': frame,
+                        'pose': {
+                            'R': matrix[:3, :3].tolist(),
+                            't': matrix[:3, 3].T.reshape(3).tolist()
+                        }
                     }
-                }
-                to_write.append(frame_result)
+                    to_write.append(frame_result)
 
+            print(to_write)
             yaml.dump(to_write, fout, default_flow_style=None)
             fout.close()
 

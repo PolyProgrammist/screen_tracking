@@ -4,6 +4,7 @@ import click
 import coloredlogs
 import numpy as np
 from time import time
+import random
 
 from screen_tracking.common import TrackingDataReader
 from screen_tracking.test import draw_result, show_result, compare
@@ -26,6 +27,7 @@ from screen_tracking.tracker.lukas_kanade.lukas_kanade import LukasKanadeTracker
 @click.option('-a', '--algorithm', type=click.Choice(['hough', 'lk']), default='hough')
 def test(steps, algorithm, **kwargs):
     np.random.seed(42)
+    random.seed(42)
     coloredlogs.install()
     reader = TrackingDataReader(
         **kwargs

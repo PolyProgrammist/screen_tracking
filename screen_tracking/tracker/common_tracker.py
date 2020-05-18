@@ -10,7 +10,7 @@ from screen_tracking.tracker.hough_heuristics.utils import get_screen_points
 class Tracker:
     tracker_params = None
 
-    FRAMES_NUMBER_TO_TRACK = np.inf
+    FRAMES_NUMBER_TO_TRACK = 1
     INITIAL_FRAME = 1
     PREVIOUS_GROUND_TRUTH = True
 
@@ -49,6 +49,8 @@ class Tracker:
         self.write_camera(tracking_result, last_points[0], frame_number)
         predict_matrix = tracking_result[frame_number]
 
+        broken = False
+
         while cap.isOpened():
             try:
                 if frame_number == initial_frame_number + self.FRAMES_NUMBER_TO_TRACK:
@@ -82,12 +84,15 @@ class Tracker:
             except Exception as error:
                 logging.error('Tracker broken')
                 logging.exception(error)
+                broken = True
                 break
 
         print()
         for key, value in self.state.productivity.items():
             print(key, value[1])
 
+        if broken:
+            return {'broken': True}
         return tracking_result
 
     def get_points(self, cur_frame, last_frame, last_points, predict_matrix):
