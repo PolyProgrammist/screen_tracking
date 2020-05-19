@@ -88,3 +88,19 @@ def compare(model_vertices, projection_matrix, ground_truth, tracking_result, fr
     else:
         logging.info('No untracked frames')
     return average_diff
+
+def compare_one(algorithm, kwargs, reader, steps):
+    if not 'compare' in steps:
+        return
+
+    model_vertices, projection_matrix, ground_truth, tracking_result = reader.compare_input()
+    if 'broken' in tracking_result:
+        return 'broken'
+    for frame, ground_truth_matrix in ground_truth.items():
+        current_diff = external_difference(tracking_result[frame], ground_truth_matrix, projection_matrix,
+                                           model_vertices)
+        rotation_diff = current_diff[0]
+        translation_diff = current_diff[1]
+        print(rotation_diff, translation_diff)
+
+# def compare_many()

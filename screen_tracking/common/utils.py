@@ -36,6 +36,8 @@ class TrackingDataReader:
         with open(self.relative_file(file)) as fin:
             input_frames = yaml.load(fin, Loader=yaml.FullLoader)
             result = {}
+            if 'broken' in input_frames[0]:
+                return {'broken': True}
             for frame in input_frames:
                 R = np.array(frame['pose']['R'])
                 t = np.array(frame['pose']['t']).reshape((3, 1))
