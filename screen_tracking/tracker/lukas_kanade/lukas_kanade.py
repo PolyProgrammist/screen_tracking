@@ -10,6 +10,12 @@ from screen_tracking.tracker.hough_heuristics.utils.draw import show_frame
 from screen_tracking.tracker.lukas_kanade.lukas_params import TrackerParams
 
 
+#! /usr/bin/env python3
+
+import cv2
+import numpy as np
+from scipy.optimize import least_squares
+
 
 def to_mat(vec):
     a, sx, sy, m, tx, ty = vec
@@ -54,7 +60,7 @@ def from_mat(mat):
     # return np.array([np.arcsin(mat[1, 0]), mat[0, 2], mat[1, 2]])
 
 
-def track(patch_size, img_0, img_1, pose_0, pose_1=None, verbose=0):
+def track(patch_size, img_0, img_1, pose_0):
     assert(img_0.shape == img_1.shape)
     img_size = img_0.shape[1], img_1.shape[0]
 
@@ -69,9 +75,7 @@ def track(patch_size, img_0, img_1, pose_0, pose_1=None, verbose=0):
         # print((residuals ** 2).sum())
         return residuals
 
-    if pose_1 is None:
-        pose_1 = pose_0
-    x0 = from_mat(pose_1) - from_mat(pose_0)
+    x0 = np.zeros((6,))
     result = least_squares(
         func,
         x0,
@@ -80,47 +84,23 @@ def track(patch_size, img_0, img_1, pose_0, pose_1=None, verbose=0):
         xtol=1e-3,
         gtol=1e-3,
         ftol=1e-3,
-        verbose=verbose
+        # verbose=2
     )
 
     return to_mat(result.x + from_mat(pose_0))
 
 
 def show_diff(img_0, img_1, pose_0, pose_1):
+    # cv2.imshow('0', img_0)
+    # cv2.imshow('1', img_1)
+    img_0_warped = img_0
+    img_1_warped = img_1
     img_0_warped = cv2.warpAffine(img_0, pose_0, (img_0.shape[1], img_0.shape[0]))
     img_1_warped = cv2.warpAffine(img_1, pose_1, (img_1.shape[1], img_1.shape[0]))
     img_diff = np.abs(img_0_warped - img_1_warped)
-    cv2.imshow('Diff', img_diff)
+    cv2.imshow('diff', img_diff)
     cv2.waitKey(0)
-
-
-def downscale_pose(pose_mat, lvl):
-    new_pose = pose_mat.copy()
-    new_pose[:, 2] /= 2 ** lvl
-    return new_pose
-
-
-def track_pyr(patch_size, img_0, img_1, pose_0, lvl_count=3, verbose=0):
-    pyramid_0 = [img_0]
-    pyramid_1 = [img_1]
-    for lvl in range(lvl_count - 1):
-        pyramid_0.append(cv2.pyrDown(pyramid_0[-1]))
-        pyramid_1.append(cv2.pyrDown(pyramid_1[-1]))
-
-    pose = downscale_pose(pose_0, lvl_count - 1)
-    for lvl in range(lvl_count - 1, -1, -1):
-        pose_opt = track(
-            patch_size,
-            pyramid_0[lvl],
-            pyramid_1[lvl],
-            downscale_pose(pose_0, lvl),
-            pose,
-            verbose
-        )
-        pose = pose_opt
-        if lvl > 0:
-            pose[:, 2] *= 2
-    return pose
+    cv2.destroyAllWindows()
 
 
 def imgname(number):
@@ -152,9 +132,8 @@ def show_rectangle(img, patch_size, pose):
     np.array(result, np.int32)
     img = img.copy()
     cv2.polylines(img, np.array([result], np.int32), True, (0, 255, 255))
-    # cv2.imshow('rect', img)
-    # cv2.waitKey(0)
-    return img
+    cv2.imshow('rect', img)
+    cv2.waitKey(0)
 
 def convert_to_track(img):
     img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -180,8 +159,10 @@ def bohdan_tracking(cur_frame, last_frame, last_points):
         ret_points.append(point)
 
     ret_points = np.array(ret_points)
-    print(ret_points)
+    # print(ret_points)
     return ret_points
+
+
 
 class LukasKanadeTracker(Tracker):
     tracker_params = TrackerParams()
