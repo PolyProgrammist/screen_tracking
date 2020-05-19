@@ -37,6 +37,7 @@ class Frontier:
         return 1
 
     def print_best(self, caption=None, print_top_scores=False):
+        return
         if not caption:
             caption = self.__class__.__name__
         top = self.top_current()

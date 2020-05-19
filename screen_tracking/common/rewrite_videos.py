@@ -4,7 +4,21 @@ import yaml
 import copy
 import shutil
 
+
 tests_dir = '../../resources/tests/'
+
+# for test in os.listdir(tests_dir):
+#     dir = tests_dir + test
+#     if dir[-1] == 'n' or dir[-1] == 'f':
+#         continue
+#     for file in os.listdir(dir):
+#         if 'tracking_result' in file:
+#             filepath = dir + '/' + file
+#             if 'tracking_result' in filepath:
+#                 os.remove(filepath)
+#
+# exit(0)
+
 suffix = 'tv_on'
 initial_test_name = 'generated_' + suffix
 initial_test_dir = tests_dir + initial_test_name + '/'
@@ -85,4 +99,7 @@ if 'on' in suffix:
             gt_current = ground_truth[i * 10: (i + 1) * 10]
         else:
             gt_current = ground_truth[i * 10:]
+        for j, gt in enumerate(gt_current):
+            j = j + 1
+            gt['frame'] = j
         yaml.dump(gt_current, open(output, 'w'), default_flow_style=None)

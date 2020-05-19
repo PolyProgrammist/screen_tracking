@@ -2,6 +2,7 @@ import logging
 
 import cv2
 import numpy as np
+import time
 
 from screen_tracking.tracker.hough_heuristics.tracker_params import TrackerState
 from screen_tracking.tracker.hough_heuristics.utils import get_screen_points
@@ -10,9 +11,9 @@ from screen_tracking.tracker.hough_heuristics.utils import get_screen_points
 class Tracker:
     tracker_params = None
 
-    FRAMES_NUMBER_TO_TRACK = 1
+    FRAMES_NUMBER_TO_TRACK = np.inf
     INITIAL_FRAME = 1
-    PREVIOUS_GROUND_TRUTH = True
+    PREVIOUS_GROUND_TRUTH = False
 
     SHOW_EACH_SIDE = int(1e9)
 
@@ -38,6 +39,7 @@ class Tracker:
     def track(self):
         self.state.productivity = {}
         tracking_result = {}
+        tracking_speed = {}
         initial_frame_number = self.INITIAL_FRAME
         cap = cv2.VideoCapture(self.video_source)
         frame_number = initial_frame_number
@@ -51,6 +53,7 @@ class Tracker:
 
         broken = False
 
+
         while cap.isOpened():
             try:
                 if frame_number == initial_frame_number + self.FRAMES_NUMBER_TO_TRACK:
@@ -61,9 +64,12 @@ class Tracker:
                 ret, frame = cap.read()
                 if not ret:
                     break
+                start_time = time.time()
                 points = self.get_points(frame, last_frame[0], last_points[0], predict_matrix)
+                end_time = time.time()
                 if points is not None:
                     self.write_camera(tracking_result, points, frame_number)
+                    tracking_speed[frame_number] = end_time - start_time
                     predict_matrix = tracking_result[frame_number]
 
                 if self.PREVIOUS_GROUND_TRUTH:
@@ -83,6 +89,7 @@ class Tracker:
                 last_frame[0] = frame
             except Exception as error:
                 logging.error('Tracker broken')
+                print(error)
                 logging.exception(error)
                 broken = True
                 break
@@ -93,10 +100,16 @@ class Tracker:
 
         if broken:
             return {'broken': True}
-        return tracking_result
+        return self.unite_tracking_result_and_tracking_time(tracking_result, tracking_speed)
 
     def get_points(self, cur_frame, last_frame, last_points, predict_matrix):
         pass
+
+    def unite_tracking_result_and_tracking_time(self, tracking_result, tracking_speed):
+        result = {}
+        for frame, array in tracking_result.items():
+            result[frame] = {'pose': array, 'time': tracking_speed.get(frame)}
+        return result
 
 
 def common_track(
