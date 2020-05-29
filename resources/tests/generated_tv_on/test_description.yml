@@ -1,7 +1,0 @@
-ground_truth: ground_truth.yml
-mesh: tv_picture_centered.obj
-projection:
-- [896.91574471, 0.0, 640.0]
-- [0.0, 896.91574471, 360.0]
-- [0.0, 0.0, 1.0]
-sequence: tv_on.mp4
