@@ -1,7 +1,0 @@
-ground_truth: ../generated_tv_on/ground_truth.yml
-mesh: ../generated_tv_on/tv_picture_centered.obj
-projection:
-- [896.91574471, 0.0, 640.0]
-- [0.0, 896.91574471, 360.0]
-- [0.0, 0.0, 1.0]
-sequence: tv_off.mp4

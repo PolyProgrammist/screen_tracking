@@ -116,5 +116,13 @@ def my_segment_distance(inner_line, outer_line):
     return distance_point_to_abc(point, outer_line)
 
 
+def aspect_ratio(lines):
+    # TODO: get opposite line the other way
+    width = my_segment_distance(lines[1], lines[3])
+    height = my_segment_distance(lines[0], lines[2])
+    ratio = width / height
+    return ratio
+
+
 def distance_lines_predicate(last_frame_line, candidate_line):
     return my_segment_distance(last_frame_line, candidate_line)
