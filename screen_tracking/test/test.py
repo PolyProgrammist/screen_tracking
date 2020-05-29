@@ -8,7 +8,7 @@ import random
 
 from screen_tracking.common import TrackingDataReader
 from screen_tracking.test import draw_result, show_result, compare
-from screen_tracking.test.compare import compare_one
+from screen_tracking.test.compare import compare_one, compare_many
 from screen_tracking.tracker.common_tracker import common_track
 from screen_tracking.tracker.hough_heuristics import tracking as hough_tracking
 from screen_tracking.tracker.hough_heuristics.tracking import HoughTracker
@@ -33,13 +33,14 @@ def run_tracking(algorithm, kwargs, reader, steps):
         stop = time()
         print("Time elapsed: " + str(stop - start))
 
-def run_several(kwargs, algorithms, steps, function):
+def run_several(kwargs, algorithms, steps, function, function_then=None):
     for algorithm in algorithms:
         suffixes = ['']
         test_count_number = kwargs['test_count_number']
         test_start_number = kwargs['test_start_number']
         if test_count_number != 1 or test_start_number != 0:
             suffixes = [str(i) for i in range(test_start_number, test_start_number + test_count_number)]
+        function_results = {}
         for suffix in suffixes:
             test_dir = 'resources/tests/'
             tests = \
@@ -52,8 +53,16 @@ def run_several(kwargs, algorithms, steps, function):
                 reader = TrackingDataReader(
                     **kwargs
                 )
-                function(algorithm, kwargs, reader, steps)
+                function_results[kwargs['test_directory'] + kwargs['tracking_result_output']] = \
+                    {
+                        'test_directory': current_test,
+                        'algorithm': algorithm,
+                        'suffix': suffix,
+                        'result': function(algorithm, kwargs, reader, steps)
+                    }
 
+        if function_then:
+            function_then(function_results, algorithm)
 
 @click.command()
 @click.option('--test', 'test_directory', default=TrackingDataReader.DEFAULT_TEST,
@@ -88,7 +97,7 @@ def test(steps, algorithm, **kwargs):
             show_result.show_result(reader.show_input())
     else:
         run_several(kwargs, [algorithm], steps, run_tracking)
-        run_several(kwargs, ['hough', 'rapid'], steps, compare_one)
+        run_several(kwargs, ['hough', 'rapid'], steps, compare_one, compare_many)
 
 
 

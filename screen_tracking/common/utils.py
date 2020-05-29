@@ -42,6 +42,11 @@ class TrackingDataReader:
                 R = np.array(frame['pose']['R'])
                 t = np.array(frame['pose']['t']).reshape((3, 1))
                 result[frame['frame']] = np.hstack((R, t))
+                if 'time' in frame:
+                    result[frame['frame']] = {
+                        'pose': result[frame['frame']],
+                        'time': frame['time']
+                    }
         return result
 
     def get_ground_truth(self):
@@ -115,7 +120,7 @@ class TrackingDataReader:
             self.get_model_vertices(), \
             self.get_projection_matrix(), \
             self.get_ground_truth(), \
-            self.get_tracking_result_output()
+            self.get_tracking_result_output(),
 
     def tracker_input(self):
         return \

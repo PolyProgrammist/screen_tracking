@@ -73,7 +73,7 @@ def compare(model_vertices, projection_matrix, ground_truth, tracking_result, fr
     average_diff = np.array([0.0, 0.0, 0.0])
     for frame, ground_truth_matrix in ground_truth.items():
         if frame in tracking_result:
-            current_diff = external_difference(tracking_result[frame], ground_truth_matrix, projection_matrix, model_vertices)
+            current_diff = external_difference(tracking_result[frame]['pose'], ground_truth_matrix, projection_matrix, model_vertices)
             log_errors(current_diff, 'Frame ' + str(frame))
             if frames_to_compare is None or frame in frames_to_compare:
                 average_diff += current_diff
@@ -96,11 +96,61 @@ def compare_one(algorithm, kwargs, reader, steps):
     model_vertices, projection_matrix, ground_truth, tracking_result = reader.compare_input()
     if 'broken' in tracking_result:
         return 'broken'
+
+    comparing_result = {}
     for frame, ground_truth_matrix in ground_truth.items():
-        current_diff = external_difference(tracking_result[frame], ground_truth_matrix, projection_matrix,
+        current_diff = external_difference(tracking_result[frame]['pose'], ground_truth_matrix, projection_matrix,
                                            model_vertices)
         rotation_diff = current_diff[0]
         translation_diff = current_diff[1]
-        print(rotation_diff, translation_diff)
 
-# def compare_many()
+        comparing_result[frame] = {}
+        comparing_result[frame]['time'] = tracking_result[frame]['time']
+        comparing_result[frame]['rotation_diff'] = rotation_diff
+        comparing_result[frame]['translation_diff'] = translation_diff
+
+    return comparing_result
+
+def compare_many(function_results, algorithm):
+    print(algorithm)
+    rotation_dif_all = 0
+    translation_dif_all = 0
+    all = 0
+    passed = 0
+    passed_translation = 0
+    passed_rotation = 0
+    frame_handle_time = {}
+    all_not_broken = {}
+    for dir, elem in function_results.items():
+        if elem['result'] == 'broken':
+            # TODO: change to number of frames
+            all += 10 if 'generated_tv_on9' in dir or 'generated_tv_off9' in dir else 9
+            continue
+        for frame, result in elem['result'].items():
+            if frame == 1:
+                continue
+            rotation_dif = result['rotation_diff']
+            translation_dif = result['translation_diff']
+            rotation_dif_all += rotation_dif
+            translation_dif_all += translation_dif
+            passed += translation_dif <= 0.01 and rotation_dif <= 0.01
+            passed_translation += translation_dif <= 0.01
+            passed_rotation += rotation_dif <= 0.05
+            all += 1
+
+            if elem['suffix'] not in frame_handle_time:
+                frame_handle_time[elem['suffix']] = 0
+                all_not_broken[elem['suffix']] = 0
+            all_not_broken[elem['suffix']] += 1
+            frame_handle_time[elem['suffix']] += result['time']
+
+    times = []
+    for suffix in frame_handle_time:
+        times.append(1 / (frame_handle_time[suffix] / all_not_broken[suffix]))
+    print('FPS mean:', np.mean(times))
+    print('FPS variance:', np.var(times))
+
+    rotation_dif_all /= all
+    translation_dif_all /= all
+    print('Tracking success rate:', passed / all)
+    print(passed_rotation, passed_translation)
