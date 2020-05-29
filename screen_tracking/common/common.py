@@ -17,3 +17,8 @@ def normalize_angle(angle, round_module=2 * math.pi):
     angle %= round_module
     angle = min(angle, round_module - angle)
     return angle
+
+
+def tracking_result_file(algorithm, suffix):
+    result = 'tracking_result_' + algorithm + suffix + '.yml'
+    return result

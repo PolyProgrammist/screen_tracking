@@ -4,7 +4,7 @@ from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candid
 from screen_tracking.tracker.hough_heuristics.utils import (
     rectangle_draw)
 from screen_tracking.tracker.hough_heuristics.utils.geom2d import intersected_lines, \
-    my_segment_distance
+    my_segment_distance, aspect_ratio
 
 
 class AspectRatioCandidate(Candidate):
@@ -20,11 +20,7 @@ class AspectRatioCandidate(Candidate):
     def aspect_ratio(lines):
         # TODO: inherit intersected lines from parent, don't count each time
         lines = intersected_lines(lines)
-        # TODO: get opposite line the other way
-        width = my_segment_distance(lines[1], lines[3])
-        height = my_segment_distance(lines[0], lines[2])
-        ratio = width / height
-        return ratio
+        return aspect_ratio(lines)
 
     def draw(self, frame):
         rectangle_draw(frame, self)
