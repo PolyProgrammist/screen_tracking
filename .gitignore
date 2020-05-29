@@ -3,5 +3,5 @@
 venv
 *__pycache__
 *tmp
-*tracking_result.yml
+*tracking_result*.yml
 *out.mp4
