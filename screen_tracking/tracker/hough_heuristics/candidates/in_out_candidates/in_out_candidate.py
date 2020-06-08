@@ -9,5 +9,5 @@ class InOutCandidate(Candidate):
         self.outer = outer
 
     def draw(self, frame):
-        rectangle_draw(frame, self.inner)
-        rectangle_draw(frame, self.outer)
+        rectangle_draw(frame, self.inner, (0, 0, 255))
+        rectangle_draw(frame, self.outer, (0, 255, 0))

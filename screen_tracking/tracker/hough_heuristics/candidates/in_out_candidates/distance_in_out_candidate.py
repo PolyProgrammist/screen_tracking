@@ -1,14 +1,13 @@
 from screen_tracking.tracker.hough_heuristics.candidates.candidate import Candidate
+from screen_tracking.tracker.hough_heuristics.candidates.in_out_candidates.in_out_candidate import InOutCandidate
 from screen_tracking.tracker.hough_heuristics.utils import rectangle_draw
 from screen_tracking.tracker.hough_heuristics.utils.geom2d import screen_lines_to_points, \
     my_segment_distance
 
 
-class DistanceInOutCandidate(Candidate):
+class DistanceInOutCandidate(InOutCandidate):
     def __init__(self, candidate, tracker_params):
-        super().__init__()
-        self.inner = candidate.inner
-        self.outer = candidate.outer
+        super().__init__(candidate.inner, candidate.outer)
         delta = 0
         for inner_line, outer_line in zip(self.inner.lines, self.outer.lines):
             inner_line = inner_line.line
@@ -38,7 +37,3 @@ class DistanceInOutCandidate(Candidate):
                 points_inner[top_right][x] > points_outer[top_right][x] or \
                 points_inner[top_right][y] < points_outer[top_right][y]:
             self.allowed_ = False
-
-    def draw(self, frame):
-        rectangle_draw(frame, self.inner)
-        rectangle_draw(frame, self.outer)

@@ -97,7 +97,7 @@ def test(steps, algorithm, **kwargs):
             show_result.show_result(reader.show_input())
     else:
         run_several(kwargs, [algorithm], steps, run_tracking)
-        run_several(kwargs, ['hough', 'rapid'], steps, compare_one, compare_many)
+        run_several(kwargs, ['rapid', 'hough', 'sift', 'lk'], steps, compare_one, compare_many)
 
 
 

@@ -121,6 +121,8 @@ def compare_many(function_results, algorithm):
     passed_rotation = 0
     frame_handle_time = {}
     all_not_broken = {}
+    translation_difmax = 0.02
+    rotation_difmax = 0.02
     for dir, elem in function_results.items():
         if elem['result'] == 'broken':
             # TODO: change to number of frames
@@ -133,9 +135,9 @@ def compare_many(function_results, algorithm):
             translation_dif = result['translation_diff']
             rotation_dif_all += rotation_dif
             translation_dif_all += translation_dif
-            passed += translation_dif <= 0.01 and rotation_dif <= 0.01
-            passed_translation += translation_dif <= 0.01
-            passed_rotation += rotation_dif <= 0.05
+            passed += translation_dif <= translation_difmax and rotation_dif <= rotation_difmax
+            passed_translation += translation_dif <= translation_difmax
+            passed_rotation += rotation_dif <= rotation_difmax
             all += 1
 
             if elem['suffix'] not in frame_handle_time:
@@ -146,9 +148,9 @@ def compare_many(function_results, algorithm):
 
     times = []
     for suffix in frame_handle_time:
-        times.append(1 / (frame_handle_time[suffix] / all_not_broken[suffix]))
+        times.append(frame_handle_time[suffix] / all_not_broken[suffix])
     print('FPS mean:', np.mean(times))
-    print('FPS variance:', np.var(times))
+    print('FPS variance:', np.std(times))
 
     rotation_dif_all /= all
     translation_dif_all /= all
